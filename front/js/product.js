@@ -17,6 +17,10 @@ function loadCard(data) {
     createPrice(data.price)                         // 
     createDescription(data.description)             //
     createTitle(data.name)                          //
+
+    for (cpt = 0; cpt <= 2; cpt++) {
+        createChoice(data.colors[cpt])              // boucle pour appeler la fonction et charger les 3 couleurs
+    }
 }
 
 // function de mise à jour du prix
@@ -46,7 +50,6 @@ function createTitle(varTitle) {
 }
 
 
-
 // fonction de création de la balise image <img>
 function createImg(varImageUrl, varAltTxt) {
     const image = document.createElement("img")     // créer l'élément image
@@ -59,5 +62,17 @@ function createImg(varImageUrl, varAltTxt) {
     const parent = document.querySelector(".item__img")
     if (parent != null) {                            // test si le parent recherché existe bien
         parent.appendChild(image)                    // ajoute la balise <img>
+    }
+}
+
+
+// fonction de création de la balise image <option>
+function createChoice(varChoice) {
+    const varOption = document.createElement("option") // créer l'élément option
+    varOption.value = varChoice                        // affecte la valeur de value
+    varOption.textContent = varChoice                  // affecte le texte affiché
+    const parent = document.querySelector("#colors")
+    if (parent != null) {                              // test si le parent recherché existe bien
+        parent.appendChild(varOption)                  // ajoute la balise <option>
     }
 }
