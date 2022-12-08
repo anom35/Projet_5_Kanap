@@ -11,16 +11,14 @@ function ajouteArticles(varData) {
         element = varData[cpt]
 
         // création des balises <a> et <article>
-        const artLink           = createLink(element._id)
+        const artLink = createLink(element._id)
         const article = document.createElement("article")
-
-        // création des balises <img>, <h3> et <p>
-        console.log(element)
 
         // A TESTER
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
         // ex: const { a, b } = obj;   // affecte aux variables a et b les valeurs de l'objet obj
 
+        // création des balises <img>, <h3> et <p>
         const artImage          = createImg(element.imageUrl, element.altTxt)
         const artH3             = createH3(element.name)
         const artDescription    = CreateParagraphe(element.description)
@@ -51,7 +49,7 @@ function AjoutArticle(varId, article) {
 // fonction de création de la balise de lien <a>
 function createLink(varId) {
     const baliseLink = document.createElement("a")
-    baliseLink.href = ".product.html?id=" + varId
+    baliseLink.href = "product.html?id=" + varId
     return baliseLink
 }
 
