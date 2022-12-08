@@ -7,8 +7,8 @@ fetch("http://localhost:3000/api/products")
 // fonction qui boucle pour afficher tous les articles
 function ajouteArticles(varData) {
 
-    // varData.forEach((element) => {
     for (let cpt = 0; cpt < varData.length; cpt++) {
+        element = varData[cpt]
 
         // création des balises <a> et <article>
         const artLink           = createLink(element._id)
@@ -20,11 +20,6 @@ function ajouteArticles(varData) {
         // A TESTER
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
         // ex: const { a, b } = obj;   // affecte aux variables a et b les valeurs de l'objet obj
-
-        // const _varUrlImg           = element.imageUrl
-        // const _varAltTxt           = element.altTxt
-        // const _varName             = element.name
-        // const _varDescription      = element.description
 
         const artImage          = createImg(element.imageUrl, element.altTxt)
         const artH3             = createH3(element.name)
