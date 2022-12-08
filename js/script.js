@@ -4,6 +4,11 @@ fetch("http://localhost:3000/api/products")
     .then((data) => addArticle(data))
 
 
+
+
+
+
+
 // fonction qui charge un article et l'affiche
 function addArticle(varData) {
 
