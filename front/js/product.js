@@ -1,11 +1,10 @@
 // récupération de l'URL et l'ID de l'article
-const urlPage   = window.location.search
-const urlParams = new URLSearchParams(urlPage)
-const varId     = urlParams.get("id")
-console.log({ varId })
+const urlPage   = window.location.search            // récupère l'URL de la page
+const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
+const varId     = urlParams.get("id")               // récupère l'ID de l'article
 
 // interroge la base de données
-fetch(`http://localhost:3000/api/products/${varId}`)
+fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backtics sur pc "ALT GR + 7"
     .then((res) => res.json())
     .then((data) => loadCard(data))
 
@@ -14,8 +13,8 @@ fetch(`http://localhost:3000/api/products/${varId}`)
 function loadCard(data) {
 
     console.log(data)
-    createImg(data.imageUrl, data.altTxt)           // appelle des fonctions
-    createPrice(data.price)                         // 
+    createImg(data.imageUrl, data.altTxt)           // appelle des fonctions de créations de balises
+    createPrice(data.price)                         // ou d'affection de valeurs
     createDescription(data.description)             //
     createTitle(data.name)                          //
 
