@@ -6,7 +6,7 @@ fetch("http://localhost:3000/api/products")
 
 // fonction qui boucle pour afficher tous les articles
 function ajouteArticles(varData) {
-    
+
     for (let cpt = 0; cpt < varData.length; cpt++) {    // boucle sur tous les articles
         element = varData[cpt]                          // affecte l'élément en cours à la variable element
 
@@ -24,7 +24,6 @@ function ajouteArticles(varData) {
 
         loadElementsArticle(article, artImage, artH3, artDescription)   // ajoute des balises <img>, <h3>, <p> dans la balise <article>
         AjoutArticle(artLink, article)              // ajoute le lien de l'article en cours et la balise <article>
-        console.log(artLink + " - " + article)
     }
 }
 
