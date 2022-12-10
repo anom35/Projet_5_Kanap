@@ -98,18 +98,18 @@ const varAddArticle = document.querySelector("#addToCart")   // sélection l'ID 
 varAddArticle.addEventListener("click", addQuantityToCart);  // déclanche la fonction addEventListener au click sur le bouton
 
 function addQuantityToCart() {
-    // interroge la base de données
-    fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backtics sur pc "ALT GR + 7"
-        .then((res) => res.json())
-        .then((data) => varData)
 
-        const quantityInput = document.querySelector("#quantity") // récupère la valeur de "Quantity"
-        const varQuantity = quantityInput.value                   //
+    let cart = []                                          // panier = array[]
 
-        
+    const quantityInput = document.querySelector("#quantity") // récupère la valeur
+    const varQuantity = quantityInput.value                   //
+
+    const choiceColor = document.querySelector("#colors")     // récupère la valeur
+    const varColor = choiceColor.value                        //
+    cart = [varId, varColor, varQuantity]
 
     
-    if (quantityInput != null) {
+    if (varQuantity > 0 && varColor != "") {
         // sauvegarde la quantité
 
         // La syntaxe localStorage.setItem() permet de stocker une donnée
@@ -147,6 +147,41 @@ function addQuantityToCart() {
         // let objJson = JSON.parse(objLinea);
         // alert(objJson.age) // renvoie 30
 
+        colorGrisBorder()
+
+        let objJson = {
+            id      : varId,
+            color   : varColor,
+            quantity: varQuantity
+         }
+        let objCart = JSON.stringify(objJson);
+        localStorage.setItem("cart",objCart);
+        console.log(objJson)
+         
 
     }
+    else {
+        // alert("Quantité ou couleur manquante,\nContrôler que la quantité et la couleur ont bien été renseigné !")
+        if ((varQuantity == null) || (varQuantity == 0)) {
+            const varElement = document.querySelector("input")
+            const varParent = document.getElementById("#quantity")
+            varElement.setAttribute("style", "border:2px solid #FF0000;")
+        }
+        if ((varColor == null) || (varColor == "")) {
+            const varElement = document.querySelector("select")
+            const varParent = document.getElementById("#colors")
+            varElement.setAttribute("style", "border:2px solid #FF0000;")
+        }
+    }
+}
+
+
+function colorGrisBorder() {
+    const varInput = document.querySelector("input")
+    const varQuantity = document.getElementById("#quantity")
+    varInput.setAttribute("style", "border:2px solid #767676;")
+
+    const varSelect = document.querySelector("select")
+    const varColors = document.getElementById("#colors")
+    varSelect.setAttribute("style", "border:2px solid #767676;")
 }
