@@ -2,6 +2,7 @@
 const urlPage   = window.location.search            // récupère l'URL de la page
 const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
 const varId     = urlParams.get("id")               // récupère l'ID de l'article
+let varPrice    = 0
 
 // interroge la base de données
 fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backtics sur pc "ALT GR + 7"
@@ -11,9 +12,9 @@ fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backti
 
 // fonction appelé directement
 function loadCard(data) {
-
-    console.log(data)
-    createImg(data.imageUrl, data.altTxt)              // appelle des fonctions de créations de balises
+    varPrice = data.price
+    console.log(data)                                  //! a supprimé
+    createImg(data.imageUrl, data.altTxt)              // appel des fonctions de créations de balises
     createPrice(data.price)                            // ou d'affection de valeurs
     createDescription(data.description)                //
     createTitle(data.name)                             //
@@ -110,7 +111,7 @@ function addQuantityToCart() {
 
     
     if (varQuantity > 0 && varColor != "") {
-        // sauvegarde la quantité
+        // sauvegarde l'Id, la quantité et la couleur de l'article
 
         // La syntaxe localStorage.setItem() permet de stocker une donnée
         // localStorage.setItem("prenom", "dany");
@@ -122,11 +123,11 @@ function addQuantityToCart() {
         // localStorage.removeItem("prenom");
 
         // La syntaxe localStorage.length() permet d’obtenir le nombre de paires clé/valeur
-
         // localStorage.length;
-        // La syntaxe localStorage.key() permet d’obtenir le nom de la clé en fonction de l’index spécifié
 
+        // La syntaxe localStorage.key() permet d’obtenir le nom de la clé en fonction de l’index spécifié
         // localStorage.key(0); // renvoie la clé 'prenom'
+
         // Pour obtenir toutes les clés
 
         // for( let i = 0; i < localStorage.length; i++){
@@ -147,41 +148,42 @@ function addQuantityToCart() {
         // let objJson = JSON.parse(objLinea);
         // alert(objJson.age) // renvoie 30
 
-        colorGrisBorder()
+        colorGrisBorder()                                                   // remet les border gris
 
-        let objJson = {
+        let objJson = {                                                     // créer un objet de commande
             id      : varId,
             color   : varColor,
-            quantity: varQuantity
+            price   : varPrice,
+            quantity: Number(varQuantity)
          }
-        let objCart = JSON.stringify(objJson);
-        localStorage.setItem("cart",objCart);
-        console.log(objJson)
-         
+        let objCart = JSON.stringify(objJson);                              // transforme un objet en texte json
+        localStorage.setItem(varId, objCart);                               // sauvegarde dans le localstorage
 
+        console.log("Cart: " + objCart + " - " + objJson)
+
+      //  window.location.href = "index.html"                                 // retour à la page d'accueil
     }
     else {
-        // alert("Quantité ou couleur manquante,\nContrôler que la quantité et la couleur ont bien été renseigné !")
-        if ((varQuantity == null) || (varQuantity == 0)) {
-            const varElement = document.querySelector("input")
-            const varParent = document.getElementById("#quantity")
-            varElement.setAttribute("style", "border:2px solid #FF0000;")
+        if ((varQuantity == null) || (varQuantity == 0)) {                  // test la quantité est bonne,
+            const varElement = document.querySelector("input")              // sinon la bordure passe en rouge
+            const varParent = document.getElementById("#quantity")          //
+            varElement.setAttribute("style", "border:2px solid #FF0000;")   //
         }
-        if ((varColor == null) || (varColor == "")) {
-            const varElement = document.querySelector("select")
-            const varParent = document.getElementById("#colors")
-            varElement.setAttribute("style", "border:2px solid #FF0000;")
+        if ((varColor == null) || (varColor == "")) {                       // test la couleur est sélectionné, 
+            const varElement = document.querySelector("select")             // sinon la bordure passe en rouge
+            const varParent = document.getElementById("#colors")            //
+            varElement.setAttribute("style", "border:2px solid #FF0000;")   //
         }
     }
 }
 
 
-function colorGrisBorder() {
+function colorGrisBorder() {                                                // remet les bordures en gris
     const varInput = document.querySelector("input")
     const varQuantity = document.getElementById("#quantity")
-    varInput.setAttribute("style", "border:2px solid #767676;")
+    varInput.setAttribute("style", "border:1px solid #767676;")
 
     const varSelect = document.querySelector("select")
     const varColors = document.getElementById("#colors")
-    varSelect.setAttribute("style", "border:2px solid #767676;")
+    varSelect.setAttribute("style", "border:1px solid #767676;")
 }
