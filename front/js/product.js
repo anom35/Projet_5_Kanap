@@ -3,6 +3,7 @@ const urlPage   = window.location.search            // récupère l'URL de la pa
 const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
 const varId     = urlParams.get("id")               // récupère l'ID de l'article
 let varPrice    = 0
+let urlImage    = ""
 
 // interroge la base de données
 fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backtics sur pc "ALT GR + 7"
@@ -12,6 +13,7 @@ fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backti
 
 // fonction appelé directement
 function loadCard(data) {
+    urlImage = data.imageUrl
     varPrice = data.price
     console.log(data)                                  //! a supprimé
     createImg(data.imageUrl, data.altTxt)              // appel des fonctions de créations de balises
@@ -79,22 +81,6 @@ function valideAppendData(varParent, varValue) {
 }
 
 
-//
-//  Interception du click sur bouton Ajouter
-//
-
-
-// W3schools.com
-// Exemples:
-// Ajoutez un événement click à un élément <button> :
-//
-// element.addEventListener("click", myFunction);
-//
-// function myFunction() {
-//   document.getElementById("demo").innerHTML = "Hello World";
-// }
-
-
 const varAddArticle = document.querySelector("#addToCart")   // sélection l'ID du Bouton
 varAddArticle.addEventListener("click", addQuantityToCart);  // déclanche la fonction addEventListener au click sur le bouton
 
@@ -154,22 +140,23 @@ function addQuantityToCart() {
             id      : varId,
             color   : varColor,
             price   : varPrice,
+            image   : urlImage,
             quantity: Number(varQuantity)
          }
         let objCart = JSON.stringify(objJson);                              // transforme un objet en texte json
         localStorage.setItem(varId, objCart);                               // sauvegarde dans le localstorage
 
-        console.log("Cart: " + objCart + " - " + objJson)
+        console.log("Cart: " + objCart + " - " + objJson)                   //! à supprime
 
-      //  window.location.href = "index.html"                                 // retour à la page d'accueil
+      //  window.location.href = "index.html"                               // retour à la page d'accueil
     }
     else {
-        if ((varQuantity == null) || (varQuantity == 0)) {                  // test la quantité est bonne,
+        if ((varQuantity == null) || (varQuantity === 0)) {                  // test la quantité est bonne,
             const varElement = document.querySelector("input")              // sinon la bordure passe en rouge
             const varParent = document.getElementById("#quantity")          //
             varElement.setAttribute("style", "border:2px solid #FF0000;")   //
         }
-        if ((varColor == null) || (varColor == "")) {                       // test la couleur est sélectionné, 
+        if ((varColor == null) || (varColor === "")) {                       // test la couleur est sélectionné, 
             const varElement = document.querySelector("select")             // sinon la bordure passe en rouge
             const varParent = document.getElementById("#colors")            //
             varElement.setAttribute("style", "border:2px solid #FF0000;")   //
