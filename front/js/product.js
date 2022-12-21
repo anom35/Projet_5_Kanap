@@ -53,14 +53,11 @@ function addQuantityToCart() {
     const choiceColor = document.querySelector("#colors")     // récupère la valeur
     const varColor = choiceColor.value                        //
 
-    console.log("Title:" + arrayData.name)
-    console.log("Desc:" + arrayData.description)  
-
     if ((varQuantity > 0) && (varColor != "")) {
 
         colorGrisBorder()                                              // remet les border gris
         console.log("------  enregistrement  -------")
-        let objJson = {                                                     // créer un objet de commande
+        let objJson = {                                                // créer un objet de commande
             id      : varId,
             title   : arrayData.name,
             description : arrayData.description,
@@ -69,16 +66,42 @@ function addQuantityToCart() {
             image   : arrayData.imageUrl,
             quantity: Number(varQuantity)
          }
-        let objCart = JSON.stringify(objJson);                              // transforme un objet en texte json
-        localStorage.setItem(varId, objCart);                               // sauvegarde dans le localstorage
 
-        console.log("Cart: " + objCart.title)                   //! à supprime
+        searchDuplicate(varId, varColor, varQuantity)
+        let objCart = JSON.stringify(objJson);                         // transforme un objet en texte json
+        localStorage.setItem(varId, objCart);                          // sauvegarde dans le localstorage
 
     }
     else {
         testContentFields(varQuantity, varColor)
     }
 }
+
+
+
+function searchDuplicate(id, color, quantity) {
+    let varColor    = ""
+    let varQuantity = quantity
+    const datas     = JSON.parse(localStorage)
+    let a           = 0
+    // compte si plusieurs articles identiques existe
+    for (let cpt=0; cpt <= localStorage.length; cpt++) {
+        if ((datas[cpt]._id === id) && (datas[cpt].color === color)) {
+            a += 1
+        }
+    }
+    if (a >= 2) {
+        // si plusieurs acticles existent, il faut cumuler les quantités et n'en laisser qu'un
+        for (let cpt=0; cpt <= localStorage.length; cpt++) {
+            if ((datas[cpt]._id === id) && (datas[cpt].color === color)) {
+                varQuantity += datas[cpt].quantity
+            }
+        }
+    }
+    return false
+}
+
+
 
 
 // fonction qui test si les champs sont remplis

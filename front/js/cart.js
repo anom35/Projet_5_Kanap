@@ -1,23 +1,39 @@
 let arrayItems = []
-let nbreArticles = 0
+let nbreArticles, articleEnCours = 0
 
 nbreArticles = localStorage.length
 
 if (nbreArticles > 0) {
     console.log(nbreArticles + " articles dans le panier")                          //! à supprimer
-
+    let valeurTotal, totalArticles = 0
     for (let cpt=0; cpt<nbreArticles; cpt++) {
         arrayItems.push(JSON.parse(localStorage.getItem(localStorage.key(cpt))))
 
+        valeurTotal += (arrayItems[cpt].price * arrayItems[cpt].quantity)
+        totalArticles += arrayItems[cpt].quantity
+        console.log(arrayItems[cpt].price + " - " + arrayItems[cpt].quantity)
         let parent = document.querySelector("#cart__items")
         console.log(parent)
         if (parent != null) {
             createAndAffectStruct(parent, cpt)
         }
     }
-
+    console.log(valeurTotal + " - " + totalArticles)
+    displayTotal(valeurTotal, totalArticles)
 }
 
+const varClickDelete = document.querySelector(".deleteItem")    // sélection la classe du Bouton Delete
+varClickDelete.addEventListener("click", deleteArticle);        // déclanche la fonction addEventListener au click sur le bouton
+
+//! arrêt ici, valeurTotal = NaN à résoudre.
+
+function displayTotal(valeur, quantity) {
+    const varTotal = document.querySelector("#totalPrice")
+    varTotal.textContent = Number(valeur)
+    console.log(valeur)
+    const total = document.querySelector("#totalQuantity")
+    total.textContent = quantity
+}
 
 // fonction qui créer la structure HTML et affecte les valeurs du panier
 function createAndAffectStruct(parent, cpt) {
@@ -43,4 +59,9 @@ function createAndAffectStruct(parent, cpt) {
             </div>
         </div>
     </article>`
+}
+
+
+function deleteArticle() {
+
 }
