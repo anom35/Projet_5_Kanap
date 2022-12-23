@@ -70,7 +70,7 @@ function addQuantityToCart() {
         searchDuplicate(varId, varColor, varQuantity)
         let objCart = JSON.stringify(objJson);                         // transforme un objet en texte json
         localStorage.setItem(varId, objCart);                          // sauvegarde dans le localstorage
-
+        document.location.href="index.html"
     }
     else {
         testContentFields(varQuantity, varColor)
@@ -100,7 +100,7 @@ function searchDuplicate(id, color, quantity) {
             }
         }
     }
-    return false
+
 }
 
 

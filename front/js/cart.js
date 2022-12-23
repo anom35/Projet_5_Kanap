@@ -26,7 +26,7 @@ varClickDelete.forEach(function(elem) {
 
 // création d'évennements pour les boutons "supprimer"
 let varClickModifyQuantity = document.querySelectorAll(".itemQuantity")   
-varClickDelete.forEach(function(elem) {
+varClickModifyQuantity.forEach(function(elem) {
     elem.addEventListener("click", modifyQuantity);              
 })
 
@@ -59,7 +59,7 @@ function createAndAffectStruct(parent, cpt) {
             <div class="cart__item__content__settings">
                 <div class="cart__item__content__settings__quantity">
                     <p>Qté : ${arrayItems[cpt].quantity}</p>
-                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayItems[cpt].quantity}">
+                    <input type="number" data-number="${cpt}" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayItems[cpt].quantity}">
                 </div>
                 <div class="cart__item__content__settings__delete">
                 <p class="deleteItem" data-number="${cpt}">Supprimer</p>
@@ -80,17 +80,22 @@ function deleteArticle() {
 function modifyQuantity() {
     const value  = this.getAttribute("data-number")
     const varId  = arrayItems[value].id
-    console.log(varId)
-    const parent = document.querySelector("[data-id=" + varId + "] > input")
+    const parent = document.querySelector(`[data-id="${varId}"] input`)
     console.log(parent)
     if (parent != null) {
         const valQuantity = parent.value
-        console.log(valQuantity)
+
         const varTotal = document.querySelector("#totalPrice")
         varTotal.textContent = "" + valQuantity * arrayItems[value].price + ""
 
+        // let totalQte = 0
+        // localstorage.forEach(function(cpt) {
+        //     totalQte += cpt.quantity
+        // })
         const total = document.querySelector("#totalQuantity")
-        total.textContent = "" + valQuantity + ""
+        console.log(total.textContent, valQuantity)
+        const qte = total.textContent
+        total.textContent = Number(qte) + Number(valQuantity)
     }
     //! à continuer
 }
