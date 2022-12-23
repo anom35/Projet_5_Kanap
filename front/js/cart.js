@@ -18,19 +18,17 @@ if (localStorage.length > 0) {
     displayTotal(valeurTotal, totalArticles)
 }
 
-// let elementsArray = document.querySelectorAll("whatever");
-// elementsArray.forEach(function(elem) {
-//     elem.addEventListener("input", function() {
-//         //this function does stuff
-//     });
-// });
-
 // création d'évennements pour les boutons "supprimer"
 let varClickDelete = document.querySelectorAll(".deleteItem")   
 varClickDelete.forEach(function(elem) {
     elem.addEventListener("click", deleteArticle);              
 })
 
+// création d'évennements pour les boutons "supprimer"
+let varClickModifyQuantity = document.querySelectorAll(".itemQuantity")   
+varClickDelete.forEach(function(elem) {
+    elem.addEventListener("click", modifyQuantity);              
+})
 
 
 
@@ -71,9 +69,28 @@ function createAndAffectStruct(parent, cpt) {
     </article>`
 }
 
-
+// fonction qui supprimer l'article du localStorage et recharge la page
 function deleteArticle() {
     const value = this.getAttribute("data-number")
     localStorage.removeItem(arrayItems[value].id)
     location.reload()
+}
+
+// fonction qui modifie la quantité d'un article dans le panier et met à jour le prix et le nombre d'articles
+function modifyQuantity() {
+    const value  = this.getAttribute("data-number")
+    const varId  = arrayItems[value].id
+    console.log(varId)
+    const parent = document.querySelector("[data-id=" + varId + "] > input")
+    console.log(parent)
+    if (parent != null) {
+        const valQuantity = parent.value
+        console.log(valQuantity)
+        const varTotal = document.querySelector("#totalPrice")
+        varTotal.textContent = "" + valQuantity * arrayItems[value].price + ""
+
+        const total = document.querySelector("#totalQuantity")
+        total.textContent = "" + valQuantity + ""
+    }
+    //! à continuer
 }
