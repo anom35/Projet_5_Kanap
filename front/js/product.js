@@ -81,20 +81,22 @@ function addQuantityToCart() {
 
 function searchDuplicate(id, color, quantity) {
     let varColor    = ""
+    let arrayItems  = []
     let varQuantity = quantity
-    const datas     = JSON.parse(localStorage)
-    let a           = 0
+    let a, valKey   = 0
+
     // compte si plusieurs articles identiques existe
-    for (let cpt=0; cpt <= localStorage.length; cpt++) {
-        if ((datas[cpt]._id === id) && (datas[cpt].color === color)) {
+    for (let cpt=0; cpt < localStorage.length; cpt++) {
+        arrayItems.push(JSON.parse(localStorage.getItem(localStorage.key(cpt))))
+        if ((arrayItems[cpt].id === id) && (arrayItems[cpt].color === color)) {
             a += 1
         }
     }
     if (a >= 2) {
         // si plusieurs acticles existent, il faut cumuler les quantités et n'en laisser qu'un
-        for (let cpt=0; cpt <= localStorage.length; cpt++) {
-            if ((datas[cpt]._id === id) && (datas[cpt].color === color)) {
-                varQuantity += datas[cpt].quantity
+        for (let cpt=0; cpt < localStorage.length; cpt++) {
+            if ((arrayItems[cpt].id === id) && (arrayItems[cpt].color === color)) {
+                varQuantity += arrayItems[cpt].quantity
             }
         }
     }

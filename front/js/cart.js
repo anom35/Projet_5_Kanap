@@ -1,38 +1,48 @@
 let arrayItems = []
-let nbreArticles, articleEnCours = 0
+let articleEnCours = 0
 
-nbreArticles = localStorage.length
-
-if (nbreArticles > 0) {
-    console.log(nbreArticles + " articles dans le panier")                          //! à supprimer
-    let valeurTotal, totalArticles = 0
-    for (let cpt=0; cpt<nbreArticles; cpt++) {
+if (localStorage.length > 0) {
+    let valeurTotal     = 0
+    let totalArticles   = 0
+    for (let cpt=0; cpt<localStorage.length; cpt++) {
         arrayItems.push(JSON.parse(localStorage.getItem(localStorage.key(cpt))))
 
-        valeurTotal += (arrayItems[cpt].price * arrayItems[cpt].quantity)
+        valeurTotal += arrayItems[cpt].price * arrayItems[cpt].quantity
         totalArticles += arrayItems[cpt].quantity
-        console.log(arrayItems[cpt].price + " - " + arrayItems[cpt].quantity)
+
         let parent = document.querySelector("#cart__items")
-        console.log(parent)
         if (parent != null) {
             createAndAffectStruct(parent, cpt)
         }
     }
-    console.log(valeurTotal + " - " + totalArticles)
     displayTotal(valeurTotal, totalArticles)
 }
 
-const varClickDelete = document.querySelector(".deleteItem")    // sélection la classe du Bouton Delete
-varClickDelete.addEventListener("click", deleteArticle);        // déclanche la fonction addEventListener au click sur le bouton
+// let elementsArray = document.querySelectorAll("whatever");
+// elementsArray.forEach(function(elem) {
+//     elem.addEventListener("input", function() {
+//         //this function does stuff
+//     });
+// });
 
-//! arrêt ici, valeurTotal = NaN à résoudre.
+// création d'évennements pour les boutons "supprimer"
+let varClickDelete = document.querySelectorAll(".deleteItem")   
+varClickDelete.forEach(function(elem) {
+    elem.addEventListener("click", deleteArticle);              
+})
 
+
+
+
+// function qui affiche le nombre total d'article et le total
 function displayTotal(valeur, quantity) {
     const varTotal = document.querySelector("#totalPrice")
-    varTotal.textContent = Number(valeur)
-    console.log(valeur)
+    varTotal.setAttribute("style", "font-weight: bold;")
+    varTotal.textContent = "" + valeur + ""
+
     const total = document.querySelector("#totalQuantity")
-    total.textContent = quantity
+    total.setAttribute("style", "font-weight: bold;")
+    total.textContent = "" + quantity + ""
 }
 
 // fonction qui créer la structure HTML et affecte les valeurs du panier
@@ -54,7 +64,7 @@ function createAndAffectStruct(parent, cpt) {
                     <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayItems[cpt].quantity}">
                 </div>
                 <div class="cart__item__content__settings__delete">
-                <p class="deleteItem">Supprimer</p>
+                <p class="deleteItem" data-number="${cpt}">Supprimer</p>
                 </div>
             </div>
         </div>
@@ -63,5 +73,7 @@ function createAndAffectStruct(parent, cpt) {
 
 
 function deleteArticle() {
-
+    const value = this.getAttribute("data-number")
+    console.log("this: " + this + ", value: " + value)
+    localStorage.removeItem(localStorage.getItem(value))
 }
