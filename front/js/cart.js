@@ -74,6 +74,6 @@ function createAndAffectStruct(parent, cpt) {
 
 function deleteArticle() {
     const value = this.getAttribute("data-number")
-    console.log("this: " + this + ", value: " + value)
-    localStorage.removeItem(localStorage.getItem(value))
+    localStorage.removeItem(arrayItems[value].id)
+    location.reload()
 }
