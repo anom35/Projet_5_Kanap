@@ -1,61 +1,31 @@
-// Mise à jour de la quantité en fonction des changements apporté sur la page
-function updateQuantity() {
-    document.addEventListener('change', function(event) {
-        if(event.target.classList.contains('itemQuantity')) {
-            if(event.target.value >= 1 && event.target.value <= 100) {
-                getTotal();
-                let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
-                product.quantity = event.target.value;
-                localStorage.setItem("product", JSON.stringify(productInLocalStorage));
-            }else {
-                window.alert("Champ incorrect! La quantité doit être comprise entre 1 et 100");
-            }
-        }
-    });
-    
-}
-updateQuantity();
-
-// Supprime le produit du panier suite à l'appuie sur le boutton
-function deleteProduct() {
-    const btnProductDeleted = document.getElementsByClassName("deleteItem");
-
-    for (let btn of btnProductDeleted) {
-        btn.addEventListener('click' , function(event) {
-            let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
-            productInLocalStorage.splice(productInLocalStorage.indexOf(product), 1);
-            localStorage.setItem("product" , JSON.stringify(productInLocalStorage));
-            location.reload();
-        });
-    }
-}
-deleteProduct();
-
-
-
 
 // récupère l'URL et l'ID de l'article
 const urlPage   = window.location.search            // récupère l'URL de la page
 const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
+let varId       = urlParams.get("id")
 
 // interroge la base de données
-searchProduct(urlParams.get("id"))
+searchProduct()
 
-// recherche un produit par son id
-function searchProduct(varId) {
-    fetch("http://localhost:3000/api/products/" + varId)  // les délimiteurs Backtics sur pc "ALT GR + 7"
+
+// recherche un produit par son id et charge une fonction précise
+function searchProduct() {
+    fetch("http://localhost:3000/api/products/" + varId)  
         .then((res) => res.json())
         .then((data) => loadCard(data))
 }
-function seekchProduct(varId) {
-    fetch("http://localhost:3000/api/products/" + varId)  // les délimiteurs Backtics sur pc "ALT GR + 7"
+
+//! pour une prochaine utilisation
+// recherche un produit et renvoi les données d'enregistrement
+function seekchProduct() {
+    fetch("http://localhost:3000/api/products/" + varId)  
         .then((res) => res.json())
         .then((data) => { return data })
 }
 
 // fonction appelé directement
 function loadCard(data) {
-
+    console.log(data.id)
     let parent = document.querySelector(".item__img")
     parent.innerHTML += "<img src=\""+ data.imageUrl+ "\" alt=\"" + data.altTxt + "\">"
     console.log("<img src=\""+ data.imageUrl+ "\" alt=\"" + data.altTxt + "\">")
@@ -70,7 +40,7 @@ function loadCard(data) {
     parent.textContent = data.description
 
     for (cpt = 0; cpt < data.colors.length; cpt++) {
-        createChoice(data.colors[cpt])                 // boucle pour charger les 3 couleurs
+        createChoice(data.colors[cpt])                
     }
 }
 
@@ -78,35 +48,35 @@ function loadCard(data) {
 
 // fonction de création de la balise image <option>
 function createChoice(varChoice) {
-    const varOption = document.createElement("option") // créer l'élément option
-    varOption.value = varChoice                        // affecte la valeur de value
-    varOption.textContent = varChoice                  // affecte le texte affiché
+    const varOption = document.createElement("option")
+    varOption.value = varChoice                       
+    varOption.textContent = varChoice                 
+
     const parent = document.querySelector("#colors")
     parent.appendChild(varOption)    
 }
 
-
-const varAddArticle = document.querySelector("#addToCart")   // sélection l'ID du Bouton
-varAddArticle.addEventListener("click", addQuantityToCart);  // déclanche la fonction addEventListener au click sur le bouton
+// déclanche la fonction addQuantityToCard au click sur le bouton
+const varAddArticle = document.querySelector("#addToCart") 
+varAddArticle.addEventListener("click", addQuantityToCart);  
 
 function addQuantityToCart() {
 
-    const quantityInput = document.querySelector("#quantity") // récupère la valeur
-    const varQuantity = quantityInput.value                   //
-    const choiceColor = document.querySelector("#colors")     // récupère la valeur
-    const varColor = choiceColor.value                        //
+    const quantityInput = document.querySelector("#quantity")
+    const varQuantity = quantityInput.value                  
+    const choiceColor = document.querySelector("#colors")    
+    const varColor = choiceColor.value                       
 
     if ((varQuantity > 0) && (varColor != "")) {
 
         colorGrisBorder()                                     // remet les bordures en gris
         console.log("------  enregistrement  -------")
-        let objJson = {                                       // créer un objet de commande
-            id      : varId,
+        let objJson = {                                       
             color   : varColor,
             quantity: parseInt(varQuantity)
          }
 
-//        searchDuplicate(varId, varColor, varQuantity)
+        searchDuplicate(varId, varColor, varQuantity)
         let objCart = JSON.stringify(objJson);                // transforme un objet en texte json
         localStorage.setItem(varId, objCart);                 // sauvegarde dans le localstorage
         document.location.href="index.html"
@@ -117,7 +87,7 @@ function addQuantityToCart() {
 }
 
 
-
+//! A TESTER
 function searchDuplicate(id, color, quantity) {
     let varColor    = ""
     let arrayItems  = []

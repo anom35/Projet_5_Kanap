@@ -106,3 +106,41 @@ function modifyQuantity() {
     // }
     //! à continuer
 }
+
+
+
+
+
+
+// Mise à jour de la quantité en fonction des changements apporté sur la page
+function updateQuantity() {
+    document.addEventListener('change', function(event) {
+        if(event.target.classList.contains('itemQuantity')) {
+            if(event.target.value >= 1 && event.target.value <= 100) {
+                getTotal();
+                let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
+                product.quantity = event.target.value;
+                localStorage.setItem("product", JSON.stringify(productInLocalStorage));
+            }else {
+                window.alert("Champ incorrect! La quantité doit être comprise entre 1 et 100");
+            }
+        }
+    });
+    
+}
+updateQuantity();
+
+// Supprime le produit du panier suite à l'appuie sur le boutton
+function deleteProduct() {
+    const btnProductDeleted = document.getElementsByClassName("deleteItem");
+
+    for (let btn of btnProductDeleted) {
+        btn.addEventListener('click' , function(event) {
+            let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
+            productInLocalStorage.splice(productInLocalStorage.indexOf(product), 1);
+            localStorage.setItem("product" , JSON.stringify(productInLocalStorage));
+            location.reload();
+        });
+    }
+}
+deleteProduct();
