@@ -1,11 +1,8 @@
 let arrayItems = []
-let articleEnCours = 0
-
 if (localStorage.length > 0) {
-    let valeurTotal     = 0
-    let totalArticles   = 0
-    for (let cpt=0; cpt<localStorage.length; cpt++) {
+    for (let cpt in localStorage) {
         arrayItems.push(JSON.parse(localStorage.getItem(localStorage.key(cpt))))
+
 
         valeurTotal += arrayItems[cpt].price * arrayItems[cpt].quantity
         totalArticles += arrayItems[cpt].quantity
@@ -59,10 +56,10 @@ function createAndAffectStruct(parent, cpt) {
             <div class="cart__item__content__settings">
                 <div class="cart__item__content__settings__quantity">
                     <p>Qté : ${arrayItems[cpt].quantity}</p>
-                    <input type="number" data-number="${cpt}" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayItems[cpt].quantity}">
+                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayItems[cpt].quantity}">
                 </div>
                 <div class="cart__item__content__settings__delete">
-                <p class="deleteItem" data-number="${cpt}">Supprimer</p>
+                <p class="deleteItem">Supprimer</p>
                 </div>
             </div>
         </div>
@@ -70,77 +67,48 @@ function createAndAffectStruct(parent, cpt) {
 }
 
 // fonction qui supprimer l'article du localStorage et recharge la page
-function deleteArticle() {
-    const value = this.getAttribute("data-number")
-    localStorage.removeItem(arrayItems[value].id)
-    location.reload()
+// location.reload()
+
+
+function saveCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart))
 }
 
-// fonction qui modifie la quantité d'un article dans le panier et met à jour le prix et le nombre d'articles
-function modifyQuantity() {
-    let value = JSON.stringify(objJson); 
-    localStorage.setItem(varId, objCart); 
-
-
-
-
-    // const value  = this.getAttribute("data-number")
-    // const varId  = arrayItems[value].id
-    // const parent = document.querySelector(`[data-id="${varId}"] input`)
-    // console.log(parent)
-    // if (parent != null) {
-    //     const valQuantity = parent.value
-
-    //     const varTotal = document.querySelector("#totalPrice")
-    //     varTotal.textContent = "" + valQuantity * arrayItems[value].price + ""
-
-    //     // const findId  = JSON.parse(localStorage.getItem(localStorage.key(value)))
-    //     // const valFind = findId.quantity
-    //     let totalArticles = 0
-    //     for (let cpt=0; cpt<localStorage.length; cpt++) {
-    //         totalArticles += JSON.parse(localStorage.getItem(localStorage.key(cpt))).quantity
-    //     }
-
-    //     const total   = document.querySelector("#totalQuantity")
-    //     total.value = totalArticles
-    // }
-    //! à continuer
-}
-
-
-
-
-
-
-// Mise à jour de la quantité en fonction des changements apporté sur la page
-function updateQuantity() {
-    document.addEventListener('change', function(event) {
-        if(event.target.classList.contains('itemQuantity')) {
-            if(event.target.value >= 1 && event.target.value <= 100) {
-                getTotal();
-                let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
-                product.quantity = event.target.value;
-                localStorage.setItem("product", JSON.stringify(productInLocalStorage));
-            }else {
-                window.alert("Champ incorrect! La quantité doit être comprise entre 1 et 100");
-            }
-        }
-    });
-    
-}
-updateQuantity();
-
-// Supprime le produit du panier suite à l'appuie sur le boutton
-function deleteProduct() {
-    const btnProductDeleted = document.getElementsByClassName("deleteItem");
-
-    for (let btn of btnProductDeleted) {
-        btn.addEventListener('click' , function(event) {
-            let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
-            productInLocalStorage.splice(productInLocalStorage.indexOf(product), 1);
-            localStorage.setItem("product" , JSON.stringify(productInLocalStorage));
-            location.reload();
-        });
+function getCart() {
+    let panier = JSON.parse(localStorage.getItem("cart"))
+    if (panier == null ) {
+        return []
+    } else {
+        return JASON.parse(panier)
     }
 }
-deleteProduct();
+
+function addCart(product) {
+    let panier = getproduct()
+    let productExist = panier.find(p => p.id == product.id)
+    if (productExist != undefined) {
+        productExist.quantity++
+    } else {
+        productExist.quantity = 1
+        panier.push(product)
+    }
+    saveCart(panier)
+}
+
+function deleteArticleFromCart(product) {
+    let panier = getCart()
+    panier = panier.filter(p => p.id != product.id)
+    saveCart(panier)
+}
+
+function changeQuantityFromCart(product, quantity) {
+    let panier = getproduct()
+    let productExist = panier.find(p => p.id == product.id)
+    if (productExist != undefined) {
+        productExist.quantity += quantity
+        if (productExist.quantity <= 0) {
+            deleteArticleFromCart(product)
+        }
+    } 
+    saveCart(panier)
+}
