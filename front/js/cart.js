@@ -1,8 +1,9 @@
-let arrayItems = []
+let arrayItems  = []
+let valeurTotal = 0
 if (localStorage.length > 0) {
     for (let cpt in localStorage) {
+        console.log(cpt)
         arrayItems.push(JSON.parse(localStorage.getItem(localStorage.key(cpt))))
-
 
         valeurTotal += arrayItems[cpt].price * arrayItems[cpt].quantity
         totalArticles += arrayItems[cpt].quantity
@@ -18,7 +19,7 @@ if (localStorage.length > 0) {
 // création d'évennements pour les boutons "supprimer"
 let varClickDelete = document.querySelectorAll(".deleteItem")   
 varClickDelete.forEach(function(elem) {
-    elem.addEventListener("click", deleteArticle);              
+    elem.addEventListener("click", deleteArticleFromCart(elem.id));              
 })
 
 // création d'évennements pour les boutons "supprimer"
@@ -66,49 +67,4 @@ function createAndAffectStruct(parent, cpt) {
     </article>`
 }
 
-// fonction qui supprimer l'article du localStorage et recharge la page
 // location.reload()
-
-
-function saveCart(cart) {
-    localStorage.setItem("cart", JSON.stringify(cart))
-}
-
-function getCart() {
-    let panier = JSON.parse(localStorage.getItem("cart"))
-    if (panier == null ) {
-        return []
-    } else {
-        return JASON.parse(panier)
-    }
-}
-
-function addCart(product) {
-    let panier = getproduct()
-    let productExist = panier.find(p => p.id == product.id)
-    if (productExist != undefined) {
-        productExist.quantity++
-    } else {
-        productExist.quantity = 1
-        panier.push(product)
-    }
-    saveCart(panier)
-}
-
-function deleteArticleFromCart(product) {
-    let panier = getCart()
-    panier = panier.filter(p => p.id != product.id)
-    saveCart(panier)
-}
-
-function changeQuantityFromCart(product, quantity) {
-    let panier = getproduct()
-    let productExist = panier.find(p => p.id == product.id)
-    if (productExist != undefined) {
-        productExist.quantity += quantity
-        if (productExist.quantity <= 0) {
-            deleteArticleFromCart(product)
-        }
-    } 
-    saveCart(panier)
-}

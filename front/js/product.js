@@ -15,13 +15,6 @@ function searchProduct() {
         .then((data) => loadCard(data))
 }
 
-//! pour une prochaine utilisation
-// recherche un produit et renvoi les données d'enregistrement
-function seekchProduct() {
-    fetch("http://localhost:3000/api/products/" + varId)  
-        .then((res) => res.json())
-        .then((data) => { return data })
-}
 
 // fonction appelé directement
 function loadCard(data) {
@@ -71,7 +64,8 @@ function addQuantityToCart() {
 
         colorGrisBorder()                                     // remet les bordures en gris
         console.log("------  enregistrement  -------")
-        let objJson = {                                       
+        let objJson = {    
+            id      : varId,
             color   : varColor,
             quantity: parseInt(varQuantity)
          }
