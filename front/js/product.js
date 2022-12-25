@@ -1,21 +1,64 @@
-// récupération de l'URL et l'ID de l'article
+// Mise à jour de la quantité en fonction des changements apporté sur la page
+function updateQuantity() {
+    document.addEventListener('change', function(event) {
+        if(event.target.classList.contains('itemQuantity')) {
+            if(event.target.value >= 1 && event.target.value <= 100) {
+                getTotal();
+                let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
+                product.quantity = event.target.value;
+                localStorage.setItem("product", JSON.stringify(productInLocalStorage));
+            }else {
+                window.alert("Champ incorrect! La quantité doit être comprise entre 1 et 100");
+            }
+        }
+    });
+    
+}
+updateQuantity();
+
+// Supprime le produit du panier suite à l'appuie sur le boutton
+function deleteProduct() {
+    const btnProductDeleted = document.getElementsByClassName("deleteItem");
+
+    for (let btn of btnProductDeleted) {
+        btn.addEventListener('click' , function(event) {
+            let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
+            productInLocalStorage.splice(productInLocalStorage.indexOf(product), 1);
+            localStorage.setItem("product" , JSON.stringify(productInLocalStorage));
+            location.reload();
+        });
+    }
+}
+deleteProduct();
+
+
+
+
+// récupère l'URL et l'ID de l'article
 const urlPage   = window.location.search            // récupère l'URL de la page
 const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
-const varId     = urlParams.get("id")               // récupère l'ID de l'article
-let arrayData   = []
 
 // interroge la base de données
-fetch(`http://localhost:3000/api/products/${varId}`)  // les délimiteurs Backtics sur pc "ALT GR + 7"
-    .then((res) => res.json())
-    .then((data) => loadCard(data))
+searchProduct(urlParams.get("id"))
 
+// recherche un produit par son id
+function searchProduct(varId) {
+    fetch("http://localhost:3000/api/products/" + varId)  // les délimiteurs Backtics sur pc "ALT GR + 7"
+        .then((res) => res.json())
+        .then((data) => loadCard(data))
+}
+function seekchProduct(varId) {
+    fetch("http://localhost:3000/api/products/" + varId)  // les délimiteurs Backtics sur pc "ALT GR + 7"
+        .then((res) => res.json())
+        .then((data) => { return data })
+}
 
 // fonction appelé directement
 function loadCard(data) {
-    arrayData = data
 
     let parent = document.querySelector(".item__img")
-    parent.innerHTML += `<img src="${data.imageUrl}" alt="${data.altTxt}">`
+    parent.innerHTML += "<img src=\""+ data.imageUrl+ "\" alt=\"" + data.altTxt + "\">"
+    console.log("<img src=\""+ data.imageUrl+ "\" alt=\"" + data.altTxt + "\">")
 
     parent = document.querySelector("#title")
     parent.textContent = data.name
@@ -55,21 +98,17 @@ function addQuantityToCart() {
 
     if ((varQuantity > 0) && (varColor != "")) {
 
-        colorGrisBorder()                                              // remet les border gris
+        colorGrisBorder()                                     // remet les bordures en gris
         console.log("------  enregistrement  -------")
-        let objJson = {                                                // créer un objet de commande
+        let objJson = {                                       // créer un objet de commande
             id      : varId,
-            title   : arrayData.name,
-            description : arrayData.description,
             color   : varColor,
-            price   : arrayData.price,
-            image   : arrayData.imageUrl,
-            quantity: Number(varQuantity)
+            quantity: parseInt(varQuantity)
          }
 
-        searchDuplicate(varId, varColor, varQuantity)
-        let objCart = JSON.stringify(objJson);                         // transforme un objet en texte json
-        localStorage.setItem(varId, objCart);                          // sauvegarde dans le localstorage
+//        searchDuplicate(varId, varColor, varQuantity)
+        let objCart = JSON.stringify(objJson);                // transforme un objet en texte json
+        localStorage.setItem(varId, objCart);                 // sauvegarde dans le localstorage
         document.location.href="index.html"
     }
     else {

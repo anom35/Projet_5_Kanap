@@ -8,10 +8,9 @@ fetch("http://localhost:3000/api/products")
 function ajouteArticles(varData) {
 
     for (let cpt = 0; cpt < varData.length; cpt++) {   
-        element = varData[cpt]                         
-        console.log(element)
+        element = varData[cpt]  
 
-        let article = document.querySelector("#items").innerHTML += `
+        document.querySelector("#items").innerHTML += `
         <a href="./product.html?id=${element._id}">
             <article>
               <img src="${element.imageUrl}" alt="${element.altTxt}">

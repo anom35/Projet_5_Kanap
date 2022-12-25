@@ -78,24 +78,31 @@ function deleteArticle() {
 
 // fonction qui modifie la quantité d'un article dans le panier et met à jour le prix et le nombre d'articles
 function modifyQuantity() {
-    const value  = this.getAttribute("data-number")
-    const varId  = arrayItems[value].id
-    const parent = document.querySelector(`[data-id="${varId}"] input`)
-    console.log(parent)
-    if (parent != null) {
-        const valQuantity = parent.value
+    let value = JSON.stringify(objJson); 
+    localStorage.setItem(varId, objCart); 
 
-        const varTotal = document.querySelector("#totalPrice")
-        varTotal.textContent = "" + valQuantity * arrayItems[value].price + ""
 
-        // let totalQte = 0
-        // localstorage.forEach(function(cpt) {
-        //     totalQte += cpt.quantity
-        // })
-        const total = document.querySelector("#totalQuantity")
-        console.log(total.textContent, valQuantity)
-        const qte = total.textContent
-        total.textContent = Number(qte) + Number(valQuantity)
-    }
+
+
+    // const value  = this.getAttribute("data-number")
+    // const varId  = arrayItems[value].id
+    // const parent = document.querySelector(`[data-id="${varId}"] input`)
+    // console.log(parent)
+    // if (parent != null) {
+    //     const valQuantity = parent.value
+
+    //     const varTotal = document.querySelector("#totalPrice")
+    //     varTotal.textContent = "" + valQuantity * arrayItems[value].price + ""
+
+    //     // const findId  = JSON.parse(localStorage.getItem(localStorage.key(value)))
+    //     // const valFind = findId.quantity
+    //     let totalArticles = 0
+    //     for (let cpt=0; cpt<localStorage.length; cpt++) {
+    //         totalArticles += JSON.parse(localStorage.getItem(localStorage.key(cpt))).quantity
+    //     }
+
+    //     const total   = document.querySelector("#totalQuantity")
+    //     total.value = totalArticles
+    // }
     //! à continuer
 }
