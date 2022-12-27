@@ -108,13 +108,3 @@ function colorGrisBorder() {                                                // r
 function saveCart(cart) {
     localStorage.setItem(cart.id, JSON.stringify(cart))
 }
-
-// fonction récupère un article
-function getCart(varId) {
-    let panier = JSON.parse(localStorage.getItem(varId))
-    if (panier == null ) {
-        return []
-    } else {
-        return JASON.parse(panier)
-    }
-}
