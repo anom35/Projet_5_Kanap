@@ -1,49 +1,59 @@
 if (localStorage.length > 0) {
-    let arrayStorage   = []
     let valeurTotal    = 0
     let totalArticles  = 0
-    for (let cpt=0; cpt < localStorage.length; cpt++) {
-        arrayStorage.push(JSON.parse(localStorage.getItem(localStorage.key(cpt))))
-        let parent = document.querySelector("#cart__items")
-        if (parent != null) {
-            fetch("http://localhost:3000/api/products/" + arrayStorage[cpt].id)  
-            .then((res) => res.json())
-            .then((data) => { 
-                totalArticles += arrayStorage[cpt].quantity
-                valeurTotal += parseInt(data.price) * arrayStorage[cpt].quantity
-                displayTotal(parseInt(valeurTotal), totalArticles)
-                parent.innerHTML += `
-                <article class="cart__item" data-id="${arrayStorage[cpt].id}" data-color="${data.color}">
-                    <div class="cart__item__img">
-                    <img src="${data.imageUrl}" alt="${data.altTxt}">
-                    </div>
-                    <div class="cart__item__content">
-                        <div class="cart__item__content__description">
-                            <h2>${data.name}</h2>
-                            <p>Couleur : ${arrayStorage[cpt].color}</p>
-                            <p>Prix : ${data.price}</p>
-                        </div>
-                        <div class="cart__item__content__settings">
-                            <div class="cart__item__content__settings__quantity">
-                                <p>Qté : </p>
-                                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayStorage[cpt].quantity}">
-                            </div>
-                            <div class="cart__item__content__settings__delete">
-                            <p class="deleteItem">Supprimer</p>
-                            </div>
-                        </div>
-                    </div>
-                </article>`
-            })
-        }
+    let array          = []
+    let data           = []
+    array = JSON.parse(localStorage.getItem("product"))
+    for (let cpt=0; cpt < array.length; cpt++) {
+        getProduct(array[cpt].id).then((data) => {
+            totalArticles += array[cpt].quantity
+            valeurTotal += parseInt(data.price) * array[cpt].quantity
+            displayTotal(parseInt(valeurTotal), totalArticles)
+            createProduct(data, array[cpt].color, array[cpt].quantity)
+        })
     }
 }
 
-
-
-function c(valeur) {
-    console.log(valeur)
+function createProduct(array, arrayColor, arrayQuantity) {
+    let parent = document.querySelector("#cart__items")
+    if (parent != null) {
+        parent.innerHTML += `
+        <article class="cart__item" data-id="${array.id}" data-color="${array.color}">
+            <div class="cart__item__img">
+            <img src="${array.imageUrl}" alt="${array.altTxt}">
+            </div>
+            <div class="cart__item__content">
+                <div class="cart__item__content__description">
+                    <h2>${array.name}</h2>
+                    <p>Couleur : ${arrayColor}</p>
+                    <p>Prix : ${array.price}</p>
+                </div>
+                <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                        <p>Qté : </p>
+                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayQuantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                    <p class="deleteItem">Supprimer</p>
+                    </div>
+                </div>
+            </div>
+        </article>`
+        // `${array.id}` = addEventListener("click", changeQuantityFromCart(array.id, arrayQuantity))
+    }
 }
+
+function getProduct(id) {
+    return fetch("http://localhost:3000/api/products/" + id)  
+    .then((res) => res.json())
+    .then((data) => { return data })
+    .catch((error) => {
+        window.alert("Connexion au serveur impossible !")
+        console.error("error: " + error)
+    })
+}
+
+function c(valeur) { console.log(valeur) }
 
 
 // let varClickDeleteArticle = document.querySelectorAll(".deleteItem")   
@@ -55,11 +65,9 @@ function c(valeur) {
 //     varClickModifyQuantity[cpt] = document.addEventListener("change", changeQuantityFromCart(data.id))
 // }
 
-// création d'évennements pour les boutons "supprimer"
-// let varClickModifyQuantity = document.querySelectorAll(".itemQuantity")   
-// varClickModifyQuantity.forEach(function(elem) {
-//     elem.addEventListener("change", changeQuantityFromCart(elem))
-// })
+// création d'évennements pour modifier les quantités"
+// document.querySelectorAll(".itemQuantity").forEach(elem => elem.addEventListener("click", changeQuantityFromCart(elem)))
+
 
 // function qui affiche le nombre total d'articles et le prix total
 function displayTotal(valeur, quantity) {
@@ -87,17 +95,19 @@ function deleteArticleFromCart(id) {
 }
 
 // fonction qui change la quantité d'un article dans le panier
-function changeQuantityFromCart(product, quantity) {
-    let panier = getCart(product)
-    let productExist = panier.find(p => p.id == product.id)
-    if (productExist != undefined) {
-        productExist.quantity += quantity
-        if (productExist.quantity <= 0) {
-            deleteArticleFromCart(productExist)
-        } else {
-            saveCart(panier)
-        }
-    } 
+function changeQuantityFromCart(id, qtyStorage) {
+    c(id)
+    getProduct(id).then((data) => {
+        let productExist = panier.find(p => p.id == data.id)
+        if (productExist != undefined) {
+            productExist.quantity += data.quantity
+            if (productExist.quantity <= 0) {
+                deleteArticleFromCart(productExist)
+            } else {
+                saveCart(panier)
+            }
+        } 
+    })
 }
 
 
