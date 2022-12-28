@@ -1,7 +1,10 @@
 // interroge la base de données
 fetch("http://localhost:3000/api/products")
-    .then((res) => res.json())
-    .then((data) => ajouteArticles(data))              
+  .then((res) => res.json())
+  .then((data) => ajouteArticles(data))
+  .catch((error) => {
+    window.alert("Connexion au serveur impossible !")
+  })
 
 
 // fonction qui boucle pour afficher tous les articles

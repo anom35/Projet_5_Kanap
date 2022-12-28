@@ -3,10 +3,7 @@
 const urlPage   = window.location.search            // récupère l'URL de la page
 const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
 let varId       = urlParams.get("id")
-
-// interroge la base de données
 searchProduct()
-
 
 // recherche un produit par son id et charge une fonction précise
 function searchProduct() {
@@ -18,7 +15,6 @@ function searchProduct() {
 
 // fonction appelé directement
 function loadCard(data) {
-    console.log(data.id)
     let parent = document.querySelector(".item__img")
     parent.innerHTML += "<img src=\""+ data.imageUrl + "\" alt=\"" + data.altTxt + "\">"
     parent = document.querySelector("#title")
@@ -47,54 +43,83 @@ function createChoice(varChoice) {
 const varAddArticle = document.querySelector("#addToCart") 
 varAddArticle.addEventListener("click", addQuantityToCart);  
 
-function addQuantityToCart() {
+
+// function qui ajoute un article et test s'il existe déjà, si oui, alors il ajoute la quantité à l'article existant
+function addQuantityToCart(objJson) {
+    const btnAddToCart = document.getElementById("addToCart")
+    let arrayProduct = JSON.parse(localStorage.getItem("product"))
+
     const quantityInput = document.querySelector("#quantity")
     const varQuantity = quantityInput.value                  
     const choiceColor = document.querySelector("#colors")    
     const varColor = choiceColor.value                       
 
-    if ((varQuantity > 0) && (varColor != "")) {
-        colorGrisBorder()                                     // remet les bordures en gris
+    // test si quantity est en 1 et 100 et si la couleur n'est pas vide
+    if ((varQuantity > 0 && varQuantity <= 100) && (varColor != "")) {
+        colorGrisBorder()                                 
         let objJson = {    
             id      : varId,
             color   : varColor,
             quantity: parseInt(varQuantity)
-         }
-        // searchDuplicate(varId, varColor, varQuantity)
-        saveCart(objJson)
-        document.location.href="index.html"
-    }
-    else {
+        }
+        // si le tableau est null, alors l'initialiser et ajouter l'objet puis sauvegarder dans le localstorage
+        if (arrayProduct == null) {
+            arrayProduct = []
+            arrayProduct.push(objJson)  
+        } else {
+            // le tableau existe, alors chercher si un doublon existe
+            c("type:" + typeof(arrayProduct) + ", valeurs:" + arrayProduct)
+            let seekArrayProduct = arrayProduct.find(element => element.id == objJson.id && element.color == objJson.color)
+            if (seekArrayProduct) {
+                if (parseInt(seekArrayProduct.quantity) + parseInt(objJson.quantity)) {
+                    arrayProduct.forEach(element => {
+                        if (element.id == objJson.id && element.color == objJson.color) {
+                            element.quantity = parseInt(element.quantity) + parseInt(objJson.quantity)
+                        }
+                    });                
+                } else {
+                    return window.alert("Quantité maximale dans le panier est atteinte")
+                }
+            } else {
+                arrayProduct.push(objJson)
+            }
+        }
+        localStorage.setItem("product", JSON.stringify(arrayProduct))
+        window.location.href = "index.html"
+    } else {
         testContentFields(varQuantity, varColor)
     }
 }
 
+function c(valeur) {
+    console.log(valeur)
+}
 
 // fonction qui test si les champs sont remplis, sinon change les bordures en rouge
 function testContentFields(varQuantity, varColor) {
     if (varQuantity <= 0) { 
-        const varElement = document.querySelector("input")              // sinon la bordure passe en rouge
-        const varParent = document.getElementById("#quantity")          //
-        varElement.setAttribute("style", "border:2px solid #FF0000;")   //
+        const varElement = document.querySelector("input")
+        const varParent = document.getElementById("#quantity")
+        varElement.setAttribute("style", "border:2px solid #FF0000;")
     } else {
-        const varSelect = document.querySelector("input")               // sinon la bordure passe en grise
+        const varSelect = document.querySelector("input")         
         const varColors = document.getElementById("#quantity")
         varSelect.setAttribute("style", "border:1px solid #767676;")
     }
     if (varColor == "") {                   
-        const varElement = document.querySelector("select")             // sinon la bordure passe en rouge
-        const varParent = document.getElementById("#colors")            //
-        varElement.setAttribute("style", "border:2px solid #FF0000;")   //
+        const varElement = document.querySelector("select")
+        const varParent = document.getElementById("#colors")  
+        varElement.setAttribute("style", "border:2px solid #FF0000;")  
     }  else {
-        const varElement = document.querySelector("select")             // sinon la bordure passe en grise
-        const varParent = document.getElementById("#colors")            //
-        varElement.setAttribute("style", "border:1px solid #767676;")   //
+        const varElement = document.querySelector("select")
+        const varParent = document.getElementById("#colors")
+        varElement.setAttribute("style", "border:1px solid #767676;")
     }
 }
 
 
 // fonction qui met les bordures en gris
-function colorGrisBorder() {                                                // remet les bordures en gris
+function colorGrisBorder() {                              
     const varInput = document.querySelector("input")
     const varQuantity = document.getElementById("#quantity")
     varInput.setAttribute("style", "border:1px solid #767676;")
@@ -102,9 +127,4 @@ function colorGrisBorder() {                                                // r
     const varSelect = document.querySelector("select")
     const varColors = document.getElementById("#colors")
     varSelect.setAttribute("style", "border:1px solid #767676;")
-}
-
-// fonction sauvegarde du panier dans le localstorage
-function saveCart(cart) {
-    localStorage.setItem(cart.id, JSON.stringify(cart))
 }
