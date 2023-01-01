@@ -1,147 +1,106 @@
+let panier = []
 if (localStorage.length > 0) {
-    let valeurTotal    = 0
-    let totalArticles  = 0
-    let array          = []
-    let data           = []
-    array = JSON.parse(localStorage.getItem("product"))
-    for (let cpt=0; cpt < array.length; cpt++) {
-        getProduct(array[cpt].id).then((data) => {
-            totalArticles += array[cpt].quantity
-            valeurTotal += parseInt(data.price) * array[cpt].quantity
-            displayTotal(parseInt(valeurTotal), totalArticles)
-            createProduct(data, array[cpt].color, array[cpt].quantity)
+    let record = {}
+    for (let cpt=0; cpt < localStorage.length; cpt++) {
+        const items = JSON.parse(localStorage.getItem(localStorage.key(cpt)))
+        const itemId        = items.id
+        const itemColor     = items.color
+        const itemQuantity  = items.quantity
+        c(itemId + " - " + itemColor + " - " + itemQuantity)
+        getProduct(localStorage.key(cpt)).then((data) => {
+            record = {
+                id          : itemId,
+                color       : itemColor,
+                quantity    : itemQuantity,
+                price       : data.price,
+                name        : data.name,
+                description : data.description,
+                imageUrl    : data.imageUrl,
+                altTxt      : data.altTxt,
+            }
+            panier.push(record)
+            createStructure(record)
         })
     }
+    displayQuantityTotal()
+    displayTotalPrice()
+} else {
+    window.alert("votre panier est vide !")
 }
 
-function createProduct(array, arrayColor, arrayQuantity) {
-    let parent = document.querySelector("#cart__items")
-    if (parent != null) {
-        parent.innerHTML += `
-        <article class="cart__item" data-id="${array.id}" data-color="${array.color}">
-            <div class="cart__item__img">
-            <img src="${array.imageUrl}" alt="${array.altTxt}">
+
+function getProduct(varId) {
+    return fetch("http://localhost:3000/api/products/" + varId)  
+        .then((res) => res.json())
+        .then((data) => { return data })
+        .catch((error) => {
+            window.alert("Connexion au serveur impossible !")
+          })
+}
+
+function createStructure(item) {
+    c(item)
+    const parent = document.querySelector("#cart__items")
+    parent.innerHTML += `
+    <article class="cart__item" data-id="${item.id}" data-color="${item.color}">
+        <div class="cart__item__img">
+            <img src="${item.imageUrl}" alt="${item.altTxt}">
+        </div>
+        <div class="cart__item__content">
+            <div class="cart__item__content__description">
+                <h2>${item.name}</h2>
+                <p>${item.color}</p>
+                <p>${item.price} €</p>
             </div>
-            <div class="cart__item__content">
-                <div class="cart__item__content__description">
-                    <h2>${array.name}</h2>
-                    <p>Couleur : ${arrayColor}</p>
-                    <p>Prix : ${array.price}</p>
+            <div class="cart__item__content__settings">
+                <div class="cart__item__content__settings__quantity">
+                    <p>Qté : </p>
+                    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${item.quantity}">
                 </div>
-                <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                        <p>Qté : </p>
-                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${arrayQuantity}">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
+                <div class="cart__item__content__settings__delete">
                     <p class="deleteItem">Supprimer</p>
-                    </div>
                 </div>
             </div>
-        </article>`
-        // `${array.id}` = addEventListener("click", changeQuantityFromCart(array.id, arrayQuantity))
-    }
+        </div>
+    </article>`
+    const itemSearch = `article[data-id="${item.id}"][data-color="${item.color}"]`
+    const varInput = document.querySelector(itemSearch)
+    varInput.addEventListener("input", () => updateQuantity(item.id, input.value, item))
 }
 
-function getProduct(id) {
-    return fetch("http://localhost:3000/api/products/" + id)  
-    .then((res) => res.json())
-    .then((data) => { return data })
-    .catch((error) => {
-        window.alert("Connexion au serveur impossible !")
-        console.error("error: " + error)
-    })
+function c(texte) { console.log(texte) }
+
+function updateQuantity(id, newValue, item) {
+    const itemToUpdate = panier.find((item) => item.id === id)
+    itemToUpdate.quantity = parseInt(newValue)
+    item.quantity = itemToUpdate.quantity
+    displayQuantityTotal()
+    displayTotalPrice()
+    saveData(item)
 }
 
-function c(valeur) { console.log(valeur) }
+function displayQuantityTotal() {
+    const totalQuantity = document.querySelector("#totalQuantity")
+    const total = panier.reduce((total, item) => total + item.quantity, 0)
+    totalQuantity.textContent = total
+}
+  
+function displayTotalPrice() {
+    const totalPrice = document.querySelector("#totalPrice")
+    const total = panier.reduce((total, item) => total + item.price * item.quantity, 0)
+    totalPrice.textContent = total
+}
 
-
-// let varClickDeleteArticle = document.querySelectorAll(".deleteItem")   
-// let varClickModifyQuantity = document.querySelectorAll(".itemQuantity")  
-// c(typeof(varClickDeleteArticle), "-", typeof(varClickModifyQuantity))
-// for(let cpt=0; cpt < localStorage.length; cpt++) {
-//     let data = JSON.parse(localStorage.getItem(localStorage.key(cpt)))
-//     varClickDeleteArticle[cpt] = document.addEventListener("click", deleteArticleFromCart(data.id))
-//     varClickModifyQuantity[cpt] = document.addEventListener("change", changeQuantityFromCart(data.id))
-// }
-
-// création d'évennements pour modifier les quantités"
-// document.querySelectorAll(".itemQuantity").forEach(elem => elem.addEventListener("click", changeQuantityFromCart(elem)))
-
-
-// function qui affiche le nombre total d'articles et le prix total
-function displayTotal(valeur, quantity) {
-    const varTotal = document.querySelector("#totalPrice")
-    varTotal.textContent = valeur
-    const total = document.querySelector("#totalQuantity")
-    total.textContent = quantity
+function saveData(item) {
+    const dataToSave = JSON.stringify(item)
+    const key = `${item.id}-${item.color}`
+    localStorage.setItem(key, dataToSave)
 }
 
 
-
-
-// fonction sauvegarde du panier dans le localstorage
-function saveCart(cart) {
-    localStorage.setItem(cart.id, JSON.stringify(cart))
+function deleteData(item) {
+    const key = `${item.id}-${item.color}`
+    localStorage.removeItem(key)
 }
-
-// fonction qui supprimer un article du panier
-function deleteArticleFromCart(id) {
-    const result = JSON.parse(localStorage.getItem(localStorage.key(id)))
-    if (result != null) {
-        localStorage.removeItem(id)
-        location.reload()
-    }
-}
-
-// fonction qui change la quantité d'un article dans le panier
-function changeQuantityFromCart(id, qtyStorage) {
-    c(id)
-    getProduct(id).then((data) => {
-        let productExist = panier.find(p => p.id == data.id)
-        if (productExist != undefined) {
-            productExist.quantity += data.quantity
-            if (productExist.quantity <= 0) {
-                deleteArticleFromCart(productExist)
-            } else {
-                saveCart(panier)
-            }
-        } 
-    })
-}
-
-
-
-
-// Mise à jour de la quantité en fonction des changements apporté sur la page
-function updateQuantity() {
-    document.addEventListener('change', function(event) {
-        if(event.target.classList.contains('itemQuantity')) {
-            if(event.target.value >= 1 && event.target.value <= 100) {
-                getTotal();
-                let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
-                product.quantity = event.target.value;
-                localStorage.setItem("product", JSON.stringify(productInLocalStorage));
-            }else {
-                window.alert("Champ incorrect! La quantité doit être comprise entre 1 et 100");
-            }
-        }
-    });
-    
-}
-// updateQuantity();
-
-// Supprime le produit du panier suite à l'appuie sur le boutton
-function deleteProduct() {
-    const btnProductDeleted = document.getElementsByClassName("deleteItem");
-
-    for (let btn of btnProductDeleted) {
-        btn.addEventListener('click' , function(event) {
-            let product = productInLocalStorage.find(element => element._id == event.target.parentElement.parentElement.parentElement.parentElement.dataset.id && element.color == event.target.parentElement.parentElement.parentElement.parentElement.dataset.color);
-            productInLocalStorage.splice(productInLocalStorage.indexOf(product), 1);
-            localStorage.setItem("product" , JSON.stringify(productInLocalStorage));
-            location.reload();
-        });
-    }
-}
-// deleteProduct();
+  
+  
