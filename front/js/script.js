@@ -9,10 +9,8 @@ fetch("http://localhost:3000/api/products")
 
 // fonction qui boucle pour afficher tous les articles
 function ajouteArticles(varData) {
-
     for (let cpt = 0; cpt < varData.length; cpt++) {   
         element = varData[cpt]  
-
         document.querySelector("#items").innerHTML += `
         <a href="./product.html?id=${element._id}">
             <article>
