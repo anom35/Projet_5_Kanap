@@ -21,7 +21,6 @@ if (localStorage.length > 0) {
                 imageUrl    : data.imageUrl,
                 altTxt      : data.altTxt,
             }
-            c(record)
             panier.push(record)
             createStructure(record)
          })
@@ -66,11 +65,17 @@ function createStructure(item) {
                 </div>
             </div>
         </article>`
-        const itemSearch = `article[data-id="${item.id}"][data-color="${item.color}"]`
-        const varInput = document.querySelector(itemSearch)
-        varInput.addEventListener("input", () => updateQuantity(item.id, input.value, item))
     }
 }
+
+const allItemQuantity = document.querySelectorAll(".itemQuantity")
+c(allItemQuantity)
+for (let i = 0; i < allItemQuantity.length; i++) {
+    allItemQuantity[i].addEventListener("change", (element) => {
+        c(element)
+    });
+}
+
 
 function c(texte) { console.log(texte) }
 
@@ -81,14 +86,20 @@ function testParent(parent) {
     else return false
 }
 
+// fonction qui recherche un doublon ou les paramètres "id" et "color" sont ceux de l'article en cours 
+function findIdColor(id, color) {
+    // id = id.substring(1, id.length - 1)
+    const valRetour = panier.find((element) => element.id == id && element.color == color)
+    if (valRetour != undefined) return valRetour
+    else return undefined
+}
 
-function updateQuantity(id, newValue, item) {
-    const itemToUpdate = panier.find((item) => item.id === id)
-    itemToUpdate.quantity = parseInt(newValue)
-    item.quantity = itemToUpdate.quantity
-    displayQuantityTotal()
-    displayTotalPrice()
-    saveData(item)
+
+function updateQuantity() {
+    // item.quantity =  parseInt(document.querySelector(".itemQuantity").value)
+    // displayQuantityTotal()
+    // displayTotalPrice()
+    // saveData(item)
 }
 
 function displayQuantityTotal() {
