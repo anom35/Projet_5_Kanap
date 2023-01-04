@@ -35,11 +35,11 @@ function loadCart() {
       })
   }
 }
-
-function c(valeur) { console.log(valeur) }
-
-
+//
+//-----------------------------------------------------
 // affichage d'un article en lançant ca création HTML
+//-----------------------------------------------------
+//
 function displayItem(item) {
   const article = createArticle(item)
   const imageDiv = createImageDiv(item)
@@ -50,22 +50,31 @@ function displayItem(item) {
   afficheTotalQuantity()
   afficheTotalPrice()
 }
-
+//
+//-----------------------------------------------------
 // fonction qui récupère les quantités et les additionnes pour afficher le total
+//-----------------------------------------------------
+//
 function afficheTotalQuantity() {
   const totalQuantity = document.querySelector("#totalQuantity")
   const total = cart.reduce((total, item) => total + item.quantity, 0)
   totalQuantity.textContent = total
 }
-
+//
+//-----------------------------------------------------
 // fonction qui récupère les quantités et prix et afficher le montant total du panier
+//-----------------------------------------------------
+//
 function afficheTotalPrice() {
   const totalPrice = document.querySelector("#totalPrice")
   const total = cart.reduce((total, item) => total + item.price * item.quantity, 0)
   totalPrice.textContent = total
 }
-
+//
+//-----------------------------------------------------
 // fonction qui fabrique la partie description de l'article
+//-----------------------------------------------------
+//
 function createStructDescription(item) {
   const cardItem = document.createElement("div")
   cardItem.classList.add("cart__item__content")
@@ -75,8 +84,11 @@ function createStructDescription(item) {
   cardItem.appendChild(settings)
   return cardItem
 }
-
+//
+//-----------------------------------------------------
 // fonction qui met en écoute le lien de suppression et les modifications de quantités
+//-----------------------------------------------------
+//
 function createDivSettings(item) {
   const elementDiv = document.createElement("div")
   elementDiv.classList.add("cart__item__content__settings")
@@ -84,8 +96,11 @@ function createDivSettings(item) {
   addDivDelete(elementDiv, item)
   return elementDiv
 }
-
+//
+//-----------------------------------------------------
 // fonction qui créer le block de suppression et met le lien "supprimer" en écoute
+//-----------------------------------------------------
+//
 function addDivDelete(settings, item) {
   const div = document.createElement("div")
   div.classList.add("cart__item__content__settings__delete")
@@ -96,8 +111,11 @@ function addDivDelete(settings, item) {
   div.appendChild(p)
   settings.appendChild(div)
 }
-
+//
+//-----------------------------------------------------
 // fonction qui cherche l'article à supprimer du panier et mettre à jour l'affichage
+//-----------------------------------------------------
+//
 function deleteItem(item) {
   const itemForDelete = cart.findIndex(
     (product) => product.id === item.id && product.color === item.color
@@ -110,14 +128,20 @@ function deleteItem(item) {
     deleteArticle(item)
   }
 }
-
+//
+//-----------------------------------------------------
 // fonction de suppression d'article appelé par la fonction précédente
+//-----------------------------------------------------
+//
 function deleteArticle(item) {
   const itemForDelete = document.querySelector(`article[data-id="${item.id}"][data-color="${item.color}"]`)
   itemForDelete.remove()
 }
-
+//
+//-----------------------------------------------------
 // fonction qui créer la DIV comprenant le INPUT et met en écoute pour la modification de quantité
+//-----------------------------------------------------
+//
 function addDivQuantity(settings, item) {
   const quantity = document.createElement("div")
   quantity.classList.add("cart__item__content__settings__quantity")
@@ -135,8 +159,11 @@ function addDivQuantity(settings, item) {
   quantity.appendChild(input)
   settings.appendChild(quantity)
 }
-
+//
+//-----------------------------------------------------
 // fonction qui met à jour la modification de quantité d'un article
+//-----------------------------------------------------
+//
 function ListenQuantity(id, newValue, item) {
   const itemUpdate = cart.find((item) => item.id === id)
   itemUpdate.quantity = parseInt(newValue)
@@ -145,21 +172,32 @@ function ListenQuantity(id, newValue, item) {
   afficheTotalPrice()
   saveModifyData(item)
 }
-
+//
+//-----------------------------------------------------
 // fonction qui supprimer un article du localStorage
+//-----------------------------------------------------
+//
 function deleteData(item) {
   const key = `${item.id}-${item.color}`
   localStorage.removeItem(key)
 }
-
+//
+//-----------------------------------------------------
 // fonction qui sauvegarde un article dans le localStorage
+//-----------------------------------------------------
+//
 function saveModifyData(item) {
-  const dataToSave = JSON.stringify(item)
-  const key = `${item.id}-${item.color}`
+  let tempArray    = item
+  delete tempArray.price
+  const dataToSave = JSON.stringify(tempArray)
+  const key        = `${item.id}-${item.color}`
   localStorage.setItem(key, dataToSave)
 }
-
+//
+//-----------------------------------------------------
 // fonction qui créer la DIV qui contient la description de l'article et le prix
+//-----------------------------------------------------
+//
 function createDescription(item) {
   const description = document.createElement("div")
   description.classList.add("cart__item__content__description")
@@ -174,8 +212,11 @@ function createDescription(item) {
   description.appendChild(p2)
   return description
 }
-
+//
+//-----------------------------------------------------
 // fonction qui créer l'élément article
+//-----------------------------------------------------
+//
 function createArticle(item) {
   const article = document.createElement("article")
   article.classList.add("cart__item")
@@ -183,8 +224,11 @@ function createArticle(item) {
   article.dataset.color = item.color
   return article
 }
-
+//
+//-----------------------------------------------------
 // fonction qui créer la DIV image
+//-----------------------------------------------------
+//
 function createImageDiv(item) {
   const div   = document.createElement("div")
   div.classList.add("cart__item__img")
@@ -205,8 +249,11 @@ function createImageDiv(item) {
 // * }
 // * products: [string] <-- array of product _id
 
-
+//
+//-----------------------------------------------------
 // fonction qui transmet le formulaire et les données à la page confirmation.html
+//-----------------------------------------------------
+//
 function submitForm(order) {
   order.preventDefault()     // empêche de rafraichir la page
   if (cart.length === 0) { 
@@ -225,7 +272,7 @@ function submitForm(order) {
 
   const email = document.querySelector("#email").value
   const regex = /^[A-Za-z0-9+_.-]+@(.+)$/                 
-  if (regex.test(email) === false) {
+  if (regex.test(email) === false && pass) {
     alert("Veuillez entrer une adresse mail valide")
   } else {
 
@@ -256,9 +303,11 @@ function submitForm(order) {
       })
   }
 }
-
-
+//
+//-----------------------------------------------------
 // fonction qui renvoie un tableau de tous les IDs des articles du panier
+//-----------------------------------------------------
+//
 function listIDs() {
   const numberOfProducts = localStorage.length
   let ids = []

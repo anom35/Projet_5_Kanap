@@ -1,12 +1,18 @@
-
+//
+//-----------------------------------------------------
 // récupère l'URL et l'ID de l'article
+//-----------------------------------------------------
+//
 const urlPage   = window.location.search            // récupère l'URL de la page
 const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
 let varId       = urlParams.get("id")
 let panier       = []
 searchProduct()
-
+//
+//-----------------------------------------------------
 // recherche un produit par son id et charge une fonction précise
+//-----------------------------------------------------
+//
 function searchProduct() {
     fetch("http://localhost:3000/api/products/" + varId)  
         .then((res) => res.json())
@@ -16,9 +22,11 @@ function searchProduct() {
             console.log(error)
           })
 }
-
-
+//
+//-----------------------------------------------------
 // fonction appelé directement après récupération des données du fetch
+//-----------------------------------------------------
+//
 function loadCard(data) {
     if (data != null) {
         let parent = document.querySelector(".item__img")
@@ -35,8 +43,11 @@ function loadCard(data) {
         loadPanier()
     }
 }
-
+//
+//-----------------------------------------------------
 // function qui charge le contenu du panier en vue de trouver des doublons
+//-----------------------------------------------------
+//
 function loadPanier() {
     const nbreRec  = localStorage.length
     let valStorage = {}
@@ -45,16 +56,23 @@ function loadPanier() {
         panier.push(valStorage)
     }
 }
-
-
-
+//
+//-----------------------------------------------------
 // déclenche la fonction addQuantityToCard au click sur le bouton
+//-----------------------------------------------------
+//
 document.querySelector("#addToCart").addEventListener("click", addQuantityToCart)
-
+//
+//-----------------------------------------------------
 // déclenche la fonction modifyQuantity lorsque la quantité est modifié, et la met à jour
+//-----------------------------------------------------
+//
 document.querySelector('[name="itemQuantity"]').addEventListener("input", modifyQuantity)
-
+//
+//-----------------------------------------------------
 // récupère la couleur sélectionné, et rempli la quantité avec la valeur déjà enregistré du panier si elle existe
+//-----------------------------------------------------
+//
 const elementColor = document.querySelector('#colors')
 elementColor.addEventListener("change",  () => {
     const searchArticle = findIdColor(varId, elementColor.value)
@@ -63,22 +81,27 @@ elementColor.addEventListener("change",  () => {
         testContentFields(searchArticle.quantity, elementColor.value)
     }
 }) 
-
-
-
+//
+//-----------------------------------------------------
 // fonction qui récupère la couleur sélectionné
+//-----------------------------------------------------
+//
 function recoverColor() {
     const selectColor = document.querySelector("#colors")
 }
-
+//
+//-----------------------------------------------------
 // fonction qui test le retour d'un querySelector
+//-----------------------------------------------------
+//
 function testParent(parent) {
     return (parent != null) ? true : false
 }
-
-function c(val) { console.log(val) }
-
+//
+//-----------------------------------------------------
 // fonction de création de la balise image <option>
+//-----------------------------------------------------
+//
 function createChoice(varChoice) {
     const varOption = document.createElement("option")
     varOption.value = varChoice 
@@ -86,9 +109,11 @@ function createChoice(varChoice) {
     const parent = document.querySelector("#colors")
     if (testParent(parent)) parent.appendChild(varOption)
 }
-
-
+//
+//-----------------------------------------------------
 // function qui ajoute un article et test s'il existe déjà, si oui, alors il ajoute la quantité à l'article existant
+//-----------------------------------------------------
+//
 function addQuantityToCart() {
     // récupère la quantité et la couleur sélectionné
     const currentQuantity = document.querySelector("#quantity").value
@@ -132,8 +157,11 @@ function addQuantityToCart() {
         }
     }
 }
-
+//
+//-----------------------------------------------------
 // fonction qui récupère la quantité MAJ et l'enregistre dans le localStorage
+//-----------------------------------------------------
+//
 function modifyQuantity() {
     const currentColor  = parseInt(document.querySelector("#colors").value)
     let arrayProduct    = findIdColor(varId, currentColor)
@@ -143,22 +171,30 @@ function modifyQuantity() {
         saveData(arrayProduct)
     }
 }
-
-
+//
+//-----------------------------------------------------
 // fonction qui recherche un doublon ou les paramètres "id" et "color" sont ceux de l'article en cours 
+//-----------------------------------------------------
+//
 function findIdColor(id, color) {
     const valRetour = panier.find((element) => element.id == id && element.color == color)
     return (valRetour != undefined) ? valRetour : undefined
 }
-
+//
+//-----------------------------------------------------
 // fonction de sauvegarde des données dans le localStorage
+//-----------------------------------------------------
+//
 function saveData(item) {
     const dataToSave = JSON.stringify(item)
     const key = `${item.id}-${item.color}`
     localStorage.setItem(key, dataToSave)
 }
-
+//
+//-----------------------------------------------------
 // fonction qui test si les champs sont remplis, sinon change les bordures en rouge
+//-----------------------------------------------------
+//
 function testContentFields(varQuantity, varColor) {
     if (varQuantity <= 0 || varQuantity > 100) { 
         const varElement = document.querySelector("input")
@@ -179,8 +215,11 @@ function testContentFields(varQuantity, varColor) {
         varElement.setAttribute("style", "border:1px solid #767676;")
     }
 }
-
+//
+//-----------------------------------------------------
 // fonction qui met les bordures en gris
+//-----------------------------------------------------
+//
 function colorGrisBorder() {                              
     const varInput = document.querySelector("input")
     const varQuantity = document.getElementById("#quantity")
