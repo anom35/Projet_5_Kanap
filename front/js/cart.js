@@ -204,10 +204,26 @@ function loadContact() {
   const ville   = form.elements.city.value
   const mail    = form.elements.email.value
   const contactForm = {
-      contact: { firstName: prenom, lastName: nom, address: adresse, city: ville, email: mail }, 
-      products: listIDs() }   // fournit la liste des IDs à transmettre
+      contact : { 
+        firstName : prenom, 
+        lastName  : nom, 
+        address   : adresse, 
+        city      : ville, 
+        email     : mail 
+      }, products: listIDs()  // fournit la liste des IDs à transmettre
+    }  
   return contactForm
 }
+
+// * Expects request to contain:
+// * contact: {
+// *   firstName: string,
+// *   lastName: string,
+// *   address: string,
+// *   city: string,
+// *   email: string
+// * }
+// * products: [string] <-- array of product _id
 
 
 // fonction qui transmet le formulaire et les données à la page confirmation.html
@@ -221,7 +237,6 @@ function submitForm(order) {
   if (testValidEmail()) return
 
   const dataForm = loadContact()
-  
   fetch("http://localhost:3000/api/products/order", {
     method  : "POST",
     body    : JSON.stringify(dataForm),
@@ -230,11 +245,12 @@ function submitForm(order) {
     .then((res) => res.json())
     .then((data) => {
       const orderId = data.orderId
+      alert(orderId)
       window.location.href = `confirmation.html?orderId=${orderId}`
     })
     .catch((err) => {
       console.error(err)
-      alert(err)
+      alert("erreur: " + err)
     })
 }
 
