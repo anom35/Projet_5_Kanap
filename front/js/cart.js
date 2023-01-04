@@ -2,6 +2,7 @@
 const cart = []
 
 // charge tout le localStorage dans le panier
+placeholder()
 loadCart()
 
 // sélectionne le bouton "Commander" et le met en écoute d'un click
@@ -193,6 +194,17 @@ function saveModifyData(item) {
   const key        = `${item.id}-${item.color}`
   localStorage.setItem(key, dataToSave)
 }
+
+function placeholder() {
+  const form = document.querySelector(".cart__order__form")
+  const inputs = form.querySelectorAll("input")
+  inputs.forEach((element) => { 
+    if (element.id != "order") {
+      element.setAttribute("style", "padding-left: 15px;")
+      element.setAttribute("placeholder", "champs obligatoire !") 
+    }
+  })
+}
 //
 //-----------------------------------------------------
 // fonction qui créer la DIV qui contient la description de l'article et le prix
@@ -260,20 +272,26 @@ function submitForm(order) {
     alert("Votre panier est vide !") 
     return 
   }
+
+  // test si les champs sont vides
   const form = document.querySelector(".cart__order__form")
   const inputs = form.querySelectorAll("input")
   let pass = true
   inputs.forEach((element) => {
+    element.addEventListener("input", () => { testInData(element) })
     if (element.value === "") {
-      alert("Veuillez remplir tous les champs, merci !")
+      element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
       pass = false
+    } else {
+      element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
     }
   })
-
+  // test le champs EMAIL
   const email = document.querySelector("#email").value
   const regex = /^[A-Za-z0-9+_.-]+@(.+)$/                 
-  if (regex.test(email) === false && pass) {
-    alert("Veuillez entrer une adresse mail valide")
+  if (regex.test(email) === false && !pass) {
+    const errorMail = document.querySelector("#emailErrorMsg")
+    errorMail.textContent = "Veuillez entrer une adresse mail valide"
   } else {
 
     const form = document.querySelector(".cart__order__form")
@@ -317,4 +335,16 @@ function listIDs() {
     ids.push(id)
   }
   return ids
+}
+
+
+function testInData(element) {
+  let pass = true
+  if (element.value === "") {
+    element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+    return false
+  } else {
+    element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
+    return true
+  }
 }
