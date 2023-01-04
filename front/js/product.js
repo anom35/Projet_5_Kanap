@@ -73,8 +73,7 @@ function recoverColor() {
 
 // fonction qui test le retour d'un querySelector
 function testParent(parent) {
-    if (parent != null) return true 
-    else return false
+    return (parent != null) ? true : false
 }
 
 function c(val) { console.log(val) }
@@ -91,31 +90,20 @@ function createChoice(varChoice) {
 
 // function qui ajoute un article et test s'il existe déjà, si oui, alors il ajoute la quantité à l'article existant
 function addQuantityToCart() {
-
     // récupère la quantité et la couleur sélectionné
     const currentQuantity = document.querySelector("#quantity").value
     const currentColor    = document.querySelector("#colors").value  
-
     let arrayProduct      = []
-    varId                 = varId
-    // cherche si un article avec le même ID et COLOR existe déjà dans le localstorage, et renvoi l'objet à arrayProduct
     if (localStorage.length > 0) {
         arrayProduct = findIdColor(varId, currentColor)
-
-        // test si la nouvelle quantity est entre 1 et 100, et si la couleur n'est pas vide
         if ((currentQuantity > 0 && currentQuantity <= 100) && (currentColor != "")) {
             colorGrisBorder()                              
-
-            // si un objet existe déjà avec le même ID et COLOR, alors la condition est vrai
             if (arrayProduct != undefined) {
                 arrayProduct.quantity = parseInt(currentQuantity) 
-
-                // si le cumul des deux quantitées sont > 100, alors la quantité reste à 100
                 if (arrayProduct.quantity > 100) {
                     document.querySelector("#quantity").value = 100
                     arrayProduct.quantity = 100
                 }
-                // sauvegarde des données dans le localStorage et renvois vers la page d'accueil
             } else {
                 let objJson = {
                     id       : varId,
@@ -127,7 +115,19 @@ function addQuantityToCart() {
             saveData(arrayProduct)
             window.location.href = "index.html"
         } else { 
-            // test si les champs sont remplis, et met les bordures en rouge si ce n'est pas le cas
+            testContentFields(currentQuantity, currentColor) 
+        }
+    } else {
+        if ((currentQuantity > 0 && currentQuantity <= 100) && (currentColor != "")) {
+            let objJson = {
+            id       : varId,
+            quantity : parseInt(currentQuantity),
+            color    : currentColor
+            }
+            arrayProduct = objJson
+            saveData(arrayProduct)
+            window.location.href = "index.html"
+        } else { 
             testContentFields(currentQuantity, currentColor) 
         }
     }
@@ -148,7 +148,7 @@ function modifyQuantity() {
 // fonction qui recherche un doublon ou les paramètres "id" et "color" sont ceux de l'article en cours 
 function findIdColor(id, color) {
     const valRetour = panier.find((element) => element.id == id && element.color == color)
-    if (valRetour != undefined) return valRetour
+    return (valRetour != undefined) ? valRetour : undefined
 }
 
 // fonction de sauvegarde des données dans le localStorage

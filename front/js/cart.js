@@ -1,129 +1,275 @@
-let panier = []
-if (localStorage.length > 0) {
-    let record      = {}
-    const numberOfRecord = localStorage.length 
-    for (let cpt=0; cpt < numberOfRecord; cpt++) {
-        const items         = JSON.parse(localStorage.getItem(localStorage.key(cpt)))
-        // const itemId        = items.id
-        // const itemColor     = items.color
-        // const itemQuantity  = items.quantity
-        // c(itemId + " / " + itemColor + " / " + itemQuantity)
-        fetch("http://localhost:3000/api/products/" + items.id)  
-        .then((res) => res.json())
-        .then((data) => { 
-            record = {
-                id          : items.id,
-                color       : items.color,
-                quantity    : items.quantity,
-                price       : data.price,
-                name        : data.name,
-                description : data.description,
-                imageUrl    : data.imageUrl,
-                altTxt      : data.altTxt,
-            }
-            panier.push(record)
-            createStructure(record)
-         })
-        .catch((error) => { window.alert("Connexion au serveur impossible !") })
-    }
-    displayQuantityTotal()
-    displayTotalPrice()
-} else {
-    window.alert("votre panier est vide !")
+// déclare la variable panier en globale
+const cart = []
+
+// charge tout le localStorage dans le panier
+loadCart()
+
+// sélectionne le bouton "Commander" et le met en écoute d'un click
+const orderButton = document.querySelector("#order")
+orderButton.addEventListener("click", (order) => submitForm(order))
+
+// fonction qui rempli le panier avec le contenu du localStorage, et affiche les articles
+function loadCart() {
+  const items  = localStorage.length
+  for (let cpt = 0; cpt < items; cpt++) {
+    const item  = localStorage.getItem(localStorage.key(cpt))
+    let itemParser = JSON.parse(item)
+    fetch("http://localhost:3000/api/products/" + itemParser.id)  
+    .then((res)  => res.json())
+    .then((data) => {  
+      let objectProduct = {
+        id       : itemParser.id,
+        color    : itemParser.color,
+        quantity : itemParser.quantity,
+        imageUrl : data.imageUrl,
+        altTxt   : data.altTxt,
+        price    : data.price,
+        name     : data.name
+      }
+      cart.push(objectProduct)
+      displayItem(cart[cpt])
+    })
+    .catch((error) => {
+        window.alert("--  Connexion au serveur impossible !  --")
+        console.log(error)
+      })
+  }
 }
 
+function c(valeur) { console.log(valeur) }
 
-function getProduct(varId) {
-    return fetch("http://localhost:3000/api/products/" + varId)  
-        .then((res) => res.json())
-        .then((data) => { return JSON.parse(data) })
-        .catch((error) => { window.alert("Connexion au serveur impossible !") })
+
+// affichage d'un article en lançant ca création HTML
+function displayItem(item) {
+  const article = createArticle(item)
+  const imageDiv = createImageDiv(item)
+  article.appendChild(imageDiv)
+  const cardItem = createStructDescription(item)
+  article.appendChild(cardItem)
+  document.querySelector("#cart__items").appendChild(article)
+  afficheTotalQuantity()
+  afficheTotalPrice()
 }
 
-function createStructure(item) {
-    const parent = document.querySelector("#cart__items")
-    if (testParent(parent)) {
-        parent.innerHTML += `
-        <article class="cart__item" data-id="${item.id}" data-color="${item.color}">
-            <div class="cart__item__img">
-                <img src="${item.imageUrl}" alt="${item.altTxt}">
-            </div>
-            <div class="cart__item__content">
-                <div class="cart__item__content__description">
-                    <h2>${item.name}</h2>
-                    <p>${item.color}</p>
-                    <p>${item.price} €</p>
-                </div>
-                <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                        <p>Qté : </p>
-                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${item.quantity}">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                        <p class="deleteItem">Supprimer</p>
-                    </div>
-                </div>
-            </div>
-        </article>`
-    }
+// fonction qui récupère les quantités et les additionnes pour afficher le total
+function afficheTotalQuantity() {
+  const totalQuantity = document.querySelector("#totalQuantity")
+  const total = cart.reduce((total, item) => total + item.quantity, 0)
+  totalQuantity.textContent = total
 }
 
-const allItemQuantity = document.querySelectorAll(".itemQuantity")
-c(allItemQuantity)
-for (let i = 0; i < allItemQuantity.length; i++) {
-    allItemQuantity[i].addEventListener("change", (element) => {
-        c(element)
-    });
+// fonction qui récupère les quantités et prix et afficher le montant total du panier
+function afficheTotalPrice() {
+  const totalPrice = document.querySelector("#totalPrice")
+  const total = cart.reduce((total, item) => total + item.price * item.quantity, 0)
+  totalPrice.textContent = total
 }
 
-
-function c(texte) { console.log(texte) }
-
-
-// fonction qui test le retour d'un querySelector
-function testParent(parent) {
-    if (parent != null) return true
-    else return false
+// fonction qui fabrique la partie description de l'article
+function createStructDescription(item) {
+  const cardItem = document.createElement("div")
+  cardItem.classList.add("cart__item__content")
+  const description = createDescription(item)
+  const settings = createDivSettings(item)
+  cardItem.appendChild(description)
+  cardItem.appendChild(settings)
+  return cardItem
 }
 
-// fonction qui recherche un doublon ou les paramètres "id" et "color" sont ceux de l'article en cours 
-function findIdColor(id, color) {
-    // id = id.substring(1, id.length - 1)
-    const valRetour = panier.find((element) => element.id == id && element.color == color)
-    if (valRetour != undefined) return valRetour
-    else return undefined
+// fonction qui met en écoute le lien de suppression et les modifications de quantités
+function createDivSettings(item) {
+  const elementDiv = document.createElement("div")
+  elementDiv.classList.add("cart__item__content__settings")
+  addDivQuantity(elementDiv, item)
+  addDivDelete(elementDiv, item)
+  return elementDiv
 }
 
-
-function updateQuantity() {
-    // item.quantity =  parseInt(document.querySelector(".itemQuantity").value)
-    // displayQuantityTotal()
-    // displayTotalPrice()
-    // saveData(item)
+// fonction qui créer le block de suppression et met le lien "supprimer" en écoute
+function addDivDelete(settings, item) {
+  const div = document.createElement("div")
+  div.classList.add("cart__item__content__settings__delete")
+  div.addEventListener("click", () => deleteItem(item))
+  const p   = document.createElement("p")
+  p.classList.add("deleteItem")
+  p.textContent = "Supprimer"
+  div.appendChild(p)
+  settings.appendChild(div)
 }
 
-function displayQuantityTotal() {
-    const totalQuantity = document.querySelector("#totalQuantity")
-    const total = panier.reduce((total, item) => total + item.quantity, 0)
-    totalQuantity.textContent = total
-}
-  
-function displayTotalPrice() {
-    const totalPrice = document.querySelector("#totalPrice")
-    const total = panier.reduce((total, item) => total + item.price * item.quantity, 0)
-    totalPrice.textContent = total
-}
-
-function saveData(item) {
-    const dataToSave = JSON.stringify(item)
-    const key = `${item.id}-${item.color}`
-    localStorage.setItem(key, dataToSave)
+// fonction qui cherche l'article à supprimer du panier et mettre à jour l'affichage
+function deleteItem(item) {
+  const itemForDelete = cart.findIndex(
+    (product) => product.id === item.id && product.color === item.color
+  )
+  if (itemForDelete > -1) {
+    cart.splice(itemForDelete, 1)
+    afficheTotalPrice()
+    afficheTotalQuantity()
+    deleteData(item)
+    deleteArticle(item)
+  }
 }
 
+// fonction de suppression d'article appelé par la fonction précédente
+function deleteArticle(item) {
+  const itemForDelete = document.querySelector(`article[data-id="${item.id}"][data-color="${item.color}"]`)
+  itemForDelete.remove()
+}
 
+// fonction qui créer la DIV comprenant le INPUT et met en écoute pour la modification de quantité
+function addDivQuantity(settings, item) {
+  const quantity = document.createElement("div")
+  quantity.classList.add("cart__item__content__settings__quantity")
+  const p = document.createElement("p")
+  p.textContent = "Qté : "
+  quantity.appendChild(p)
+  const input = document.createElement("input")
+  input.type  = "number"
+  input.classList.add("itemQuantity")
+  input.name  = "itemQuantity"
+  input.min   = "1"
+  input.max   = "100"
+  input.value = item.quantity
+  input.addEventListener("input", () => ListenQuantity(item.id, input.value, item))
+  quantity.appendChild(input)
+  settings.appendChild(quantity)
+}
+
+// fonction qui met à jour la modification de quantité d'un article
+function ListenQuantity(id, newValue, item) {
+  const itemUpdate = cart.find((item) => item.id === id)
+  itemUpdate.quantity = parseInt(newValue)
+  item.quantity = itemUpdate.quantity
+  afficheTotalQuantity()
+  afficheTotalPrice()
+  saveModifyData(item)
+}
+
+// fonction qui supprimer un article du localStorage
 function deleteData(item) {
-    const key = `${item.id}-${item.color}`
-    localStorage.removeItem(key)
+  const key = `${item.id}-${item.color}`
+  localStorage.removeItem(key)
 }
+
+// fonction qui sauvegarde un article dans le localStorage
+function saveModifyData(item) {
+  const dataToSave = JSON.stringify(item)
+  const key = `${item.id}-${item.color}`
+  localStorage.setItem(key, dataToSave)
+}
+
+// fonction qui créer la DIV qui contient la description de l'article et le prix
+function createDescription(item) {
+  const description = document.createElement("div")
+  description.classList.add("cart__item__content__description")
+  const h2       = document.createElement("h2")
+  h2.textContent = item.name
+  const p        = document.createElement("p")
+  p.textContent  = item.color
+  const p2       = document.createElement("p")
+  p2.textContent = item.price + " €"
+  description.appendChild(h2)
+  description.appendChild(p)
+  description.appendChild(p2)
+  return description
+}
+
+// fonction qui créer l'élément article
+function createArticle(item) {
+  const article = document.createElement("article")
+  article.classList.add("cart__item")
+  article.dataset.id    = item.id
+  article.dataset.color = item.color
+  return article
+}
+
+// fonction qui créer la DIV image
+function createImageDiv(item) {
+  const div   = document.createElement("div")
+  div.classList.add("cart__item__img")
+  const image = document.createElement("img")
+  image.src   = item.imageUrl
+  image.alt   = item.altTxt
+  div.appendChild(image)
+  return div
+}
+
+// fonction qui charge les éléments contact du formulaire, aisni que la liste des IDs des produits
+function loadContact() {
+  const form = document.querySelector(".cart__order__form")
+  const prenom  = form.elements.firstName.value
+  const nom     = form.elements.lastName.value
+  const adresse = form.elements.address.valeur
+  const ville   = form.elements.city.value
+  const mail    = form.elements.email.value
+  const contactForm = {
+      contact: { firstName: prenom, lastName: nom, address: adresse, city: ville, email: mail }, 
+      products: listIDs() }   // fournit la liste des IDs à transmettre
+  return contactForm
+}
+
+
+// fonction qui transmet le formulaire et les données à la page confirmation.html
+function submitForm(order) {
+  order.preventDefault()     // empêche de rafraichir la page
+  if (cart.length === 0) { 
+    alert("Votre panier est vide !") 
+    return 
+  }
+  if (testValidForm()) return
+  if (testValidEmail()) return
+
+  const dataForm = loadContact()
   
-  
+  fetch("http://localhost:3000/api/products/order", {
+    method  : "POST",
+    body    : JSON.stringify(dataForm),
+    headers : { "Content-Type"  : "application/json" }
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      const orderId = data.orderId
+      window.location.href = `confirmation.html?orderId=${orderId}`
+    })
+    .catch((err) => {
+      console.error(err)
+      alert(err)
+    })
+}
+
+// fonction qui test si le champs MAIL est valide
+function testValidEmail() {
+  const email = document.querySelector("#email").value
+  const regex = /^[A-Za-z0-9+_.-]+@(.+)$/                 
+  if (regex.test(email) === false) {
+    alert("Veuillez entrer une adresse mail valide")
+    return true
+  }
+  return false
+}
+
+// fonction qui test si tous les champs du FORM sont renseignés
+function testValidForm() {
+  const form = document.querySelector(".cart__order__form")
+  const inputs = form.querySelectorAll("input")
+  inputs.forEach((element) => {
+    if (element.value === "") {
+      alert("Veuillez remplir tous les champs, merci !")
+      return true
+    }
+    return false
+  })
+}
+
+// fonction qui renvoie un tableau de tous les IDs des articles du panier
+function listIDs() {
+  const numberOfProducts = localStorage.length
+  let ids = []
+  for (let cpt = 0; cpt < numberOfProducts; cpt++) {
+    const key = localStorage.key(cpt)
+    const id  = key.split("-")[0]  // transforme la clé en tableau et renvoie la 1ère valeur [0]
+    ids.push(id)
+  }
+  return ids
+}
