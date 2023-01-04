@@ -195,26 +195,6 @@ function createImageDiv(item) {
   return div
 }
 
-// fonction qui charge les éléments contact du formulaire, aisni que la liste des IDs des produits
-function loadContact() {
-  const form = document.querySelector(".cart__order__form")
-  const prenom  = form.elements.firstName.value
-  const nom     = form.elements.lastName.value
-  const adresse = form.elements.address.valeur
-  const ville   = form.elements.city.value
-  const mail    = form.elements.email.value
-  const contactForm = {
-      contact : { 
-        firstName : prenom, 
-        lastName  : nom, 
-        address   : adresse, 
-        city      : ville, 
-        email     : mail 
-      }, products: listIDs()  // fournit la liste des IDs à transmettre
-    }  
-  return contactForm
-}
-
 // * Expects request to contain:
 // * contact: {
 // *   firstName: string,
@@ -233,50 +213,50 @@ function submitForm(order) {
     alert("Votre panier est vide !") 
     return 
   }
-  if (testValidForm()) return
-  if (testValidEmail()) return
-
-  const dataForm = loadContact()
-  fetch("http://localhost:3000/api/products/order", {
-    method  : "POST",
-    body    : JSON.stringify(dataForm),
-    headers : { "Content-Type"  : "application/json" }
+  const form = document.querySelector(".cart__order__form")
+  const inputs = form.querySelectorAll("input")
+  let pass = true
+  inputs.forEach((element) => {
+    if (element.value === "") {
+      alert("Veuillez remplir tous les champs, merci !")
+      pass = false
+    }
   })
-    .then((res) => res.json())
-    .then((data) => {
-      const orderId = data.orderId
-      alert(orderId)
-      window.location.href = `confirmation.html?orderId=${orderId}`
-    })
-    .catch((err) => {
-      console.error(err)
-      alert("erreur: " + err)
-    })
-}
 
-// fonction qui test si le champs MAIL est valide
-function testValidEmail() {
   const email = document.querySelector("#email").value
   const regex = /^[A-Za-z0-9+_.-]+@(.+)$/                 
   if (regex.test(email) === false) {
     alert("Veuillez entrer une adresse mail valide")
-    return true
+  } else {
+
+    const form = document.querySelector(".cart__order__form")
+    const contactForm = {
+        contact : { 
+          firstName : form.firstName.value, 
+          lastName  : form.lastName.value, 
+          address   : form.address.value, 
+          city      : form.city.value, 
+          email     : form.email.value
+        }, products: listIDs()  // fournit la liste des IDs à transmettre
+      }  
+    // const dataForm = loadContact()
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",                     
+      body: JSON.stringify(contactForm),
+      headers: { "Content-Type"  : "application/json" }
+    })
+      .then((res) => res.json())
+      .then((data) => { 
+        const orderId = data.orderId
+        window.location.href = "confirmation.html?orderId=" + orderId
+      })
+      .catch((err) => {
+        console.error(err)
+        alert("erreur: " + err)
+      })
   }
-  return false
 }
 
-// fonction qui test si tous les champs du FORM sont renseignés
-function testValidForm() {
-  const form = document.querySelector(".cart__order__form")
-  const inputs = form.querySelectorAll("input")
-  inputs.forEach((element) => {
-    if (element.value === "") {
-      alert("Veuillez remplir tous les champs, merci !")
-      return true
-    }
-    return false
-  })
-}
 
 // fonction qui renvoie un tableau de tous les IDs des articles du panier
 function listIDs() {
