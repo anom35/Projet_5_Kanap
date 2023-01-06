@@ -204,7 +204,7 @@ function saveModifyData(item) {
 function placeholder() {
   const email = document.querySelector("#email")
   email.setAttribute("pattern", "/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;")             
-  email.addEventListener('change', () => mailIsValid())
+  email.addEventListener('change', () => mailIsValid(email))
   const form = document.querySelector(".cart__order__form")
   const inputs = form.querySelectorAll("input")
   inputs.forEach((element) => { 
@@ -216,10 +216,29 @@ function placeholder() {
 }
 
 
-function mailIsValid() {
-  const email = document.querySelector("#email")
-  email.setAttribute("pattern", "/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;")             
-
+function mailIsValid(email) {
+    if (email != undefined) {
+        email.preventDefault 
+        console.log(email)
+        const validityState   = email.validity
+        const validityMessage = email.validityMessage
+        switch(true) {
+            case validityState.valueMissing === true : {
+                email.setCustomValidity("Il faut remplir le champs !")
+                break
+            }
+            case validityState.tooShort === true : {
+                email.setCustomValidity("La taille minimum est de 6 caractères !")
+                break
+            }
+            case validityState.patternMismatch === true : {
+                email.setCustomValidity("Il faut respecter le format demandé x@x.xx !")
+                break
+            }
+            // default : email.currentTarget.submit()
+        }
+        email.reportValidity()
+    }
 }
 //
 //-----------------------------------------------------
@@ -285,7 +304,9 @@ function createImageDiv(item) {
 function submitForm(order) {
   order.preventDefault()     // empêche de rafraichir la page
   if (cart.length === 0) { 
-    alert("Votre panier est vide !") 
+    //! afficher panier vide
+    // modalWindow("PANIER", "Votre panier est vide !")
+    // alert("Votre panier est vide !") 
     return 
   }
 
@@ -297,7 +318,6 @@ function submitForm(order) {
       const contactForm = createObjetForContactForm()
       // if (mailIsValid()) {
 
-      // const dataForm = loadContact()
       fetch("http://localhost:3000/api/products/order", {
         method: "POST",                     
         body: JSON.stringify(contactForm),
