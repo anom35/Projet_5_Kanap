@@ -194,16 +194,35 @@ function saveModifyData(item) {
   const key        = `${item.id}-${item.color}`
   localStorage.setItem(key, dataToSave)
 }
-
+//
+//-----------------------------------------------------
+// fonction qui affecte un pattern regex au input #email,
+// met un peu de padding-left pour une question d'esthétique, 
+// et test si les éléments du formulaire sont vides.
+//-----------------------------------------------------
+//
 function placeholder() {
+  document.querySelector(".cart__order__form").innerHTML += `
+    <p style="color: #ff9494; text-shadow: 0 0 10px #FFF">* Tous les champs sont obligatoires !</p>`
+  console.log("radius")
+  const email = document.querySelector("#email")
+  email.setAttribute("pattern", "/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;")             
+  email.addEventListener('change', () => mailIsValid())
   const form = document.querySelector(".cart__order__form")
   const inputs = form.querySelectorAll("input")
   inputs.forEach((element) => { 
-    if (element.id != "order") {
-      element.setAttribute("style", "padding-left: 15px;")
-      element.setAttribute("placeholder", "champs obligatoire !") 
+    if (element.value != "") {
+      if (element.id === "order") element.setAttribute("style", "padding-left: 28px;")
+      if (element.id != "order") element.setAttribute("style", "padding-left: 15px;") 
     }
   })
+}
+
+
+function mailIsValid() {
+  const email = document.querySelector("#email")
+  email.setAttribute("pattern", "/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;")             
+
 }
 //
 //-----------------------------------------------------
@@ -274,51 +293,29 @@ function submitForm(order) {
   }
 
   // test si les champs sont vides
-  const form = document.querySelector(".cart__order__form")
-  const inputs = form.querySelectorAll("input")
-  let pass = true
-  inputs.forEach((element) => {
-    element.addEventListener("input", () => { testInData(element) })
-    if (element.value === "") {
-      element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
-      pass = false
-    } else {
-      element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
-    }
-  })
-  // test le champs EMAIL
-  const email = document.querySelector("#email").value
-  const regex = /^[A-Za-z0-9+_.-]+@(.+)$/                 
-  if (regex.test(email) === false && !pass) {
-    const errorMail = document.querySelector("#emailErrorMsg")
-    errorMail.textContent = "Veuillez entrer une adresse mail valide"
-  } else {
+  const pass = testFieldsIsEmpty()
+  if (pass) {
 
-    const form = document.querySelector(".cart__order__form")
-    const contactForm = {
-        contact : { 
-          firstName : form.firstName.value, 
-          lastName  : form.lastName.value, 
-          address   : form.address.value, 
-          city      : form.city.value, 
-          email     : form.email.value
-        }, products: listIDs()  // fournit la liste des IDs à transmettre
-      }  
-    // const dataForm = loadContact()
-    fetch("http://localhost:3000/api/products/order", {
-      method: "POST",                     
-      body: JSON.stringify(contactForm),
-      headers: { "Content-Type"  : "application/json" }
-    })
-      .then((res) => res.json())
-      .then((data) => { 
-        const orderId = data.orderId
-        window.location.href = "confirmation.html?orderId=" + orderId
+      // construit l'objet avec les données de contacts et la liste des IDs des articles
+      const contactForm = createObjetForContactForm()
+      // if (mailIsValid()) {
+
+      // const dataForm = loadContact()
+      fetch("http://localhost:3000/api/products/order", {
+        method: "POST",                     
+        body: JSON.stringify(contactForm),
+        headers: { "Content-Type"  : "application/json" }
       })
-      .catch((err) => {
-        console.error(err)
-        alert("erreur: " + err)
-      })
+        .then((res) => res.json())
+        .then((data) => { 
+          const orderId = data.orderId
+          window.location.href = "confirmation.html?orderId=" + orderId
+        })
+        .catch((err) => {
+          console.error(err)
+          alert("erreur: " + err)
+        })
+      // }
   }
 }
 //
@@ -336,15 +333,66 @@ function listIDs() {
   }
   return ids
 }
-
-
+//
+//-----------------------------------------------------
+// fonction qui test si le contenu d'un champs est vide, et met la bordure en rouge ou en gris
+//-----------------------------------------------------
+//
 function testInData(element) {
-  let pass = true
+  const form = document.querySelector(".cart__order__form")
+  const inputs = form.querySelectorAll("input")
   if (element.value === "") {
-    element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
-    return false
+    if (element.id != "order") {
+      element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+      return false
+    }
   } else {
-    element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
-    return true
+    if (element.id != "order") {
+      element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
+      return true
+    }
   }
+}
+//
+//-----------------------------------------------------
+// fonction qui créer l'objet qui renvoi les données de contact
+//-----------------------------------------------------
+//
+function createObjetForContactForm() {
+  const form = document.querySelector(".cart__order__form")
+  const contactForm = {
+      contact : { 
+        firstName : form.firstName.value, 
+        lastName  : form.lastName.value, 
+        address   : form.address.value, 
+        city      : form.city.value, 
+        email     : form.email.value
+      }, products: listIDs()  // fournit la liste des IDs à transmettre
+    }  
+    return contactForm
+}
+//
+//-----------------------------------------------------
+// fonction qui test si les champs contact sont vides
+//-----------------------------------------------------
+//
+function testFieldsIsEmpty() {
+  const form = document.querySelector(".cart__order__form")
+  const inputs = form.querySelectorAll("input")
+  let pass = true
+  inputs.forEach((element) => {
+    element.addEventListener("input", () => { 
+      if (element.id != "order") testInData(element) 
+    })
+    if (element.value === "") {
+      if (element.id != "order") {
+        element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+        pass = false
+      }
+    } else {
+      console.log(element.value)
+      if (element.id != "order") element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
+    }
+  })
+  return pass
 }
