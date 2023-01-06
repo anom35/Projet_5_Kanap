@@ -202,9 +202,6 @@ function saveModifyData(item) {
 //-----------------------------------------------------
 //
 function placeholder() {
-  document.querySelector(".cart__order__form").innerHTML += `
-    <p style="color: #ff9494; text-shadow: 0 0 10px #FFF">* Tous les champs sont obligatoires !</p>`
-  console.log("radius")
   const email = document.querySelector("#email")
   email.setAttribute("pattern", "/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;")             
   email.addEventListener('change', () => mailIsValid())
