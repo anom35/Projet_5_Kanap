@@ -1,5 +1,5 @@
 // déclare la variable panier en globale
-const cart = []
+const cart   = []
 
 // charge tout le localStorage dans le panier
 placeholder()
@@ -203,8 +203,7 @@ function saveModifyData(item) {
 //
 function placeholder() {
   const email = document.querySelector("#email")
-  email.setAttribute("pattern", "/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;")             
-  email.addEventListener('change', () => mailIsValid(email))
+  email.addEventListener("keyup", (element) => controlEmail(element))
   const form = document.querySelector(".cart__order__form")
   const inputs = form.querySelectorAll("input")
   inputs.forEach((element) => { 
@@ -215,30 +214,19 @@ function placeholder() {
   })
 }
 
+function controlEmail(element) { 
+  const pattern = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/i)
+  const valueTextEmail = element.currentTarget.value
+  const resultRegex = valueTextEmail.match(pattern)
+  const errorMsg = document.querySelector("#emailErrorMsg")
+  if (resultRegex == null) {
+    element.currentTarget.style.color = "#FF0000"
+    errorMsg.textContent = "Veuillez entrer une adresse email valide !"
+  } else {
+    element.currentTarget.style.color = "#000"
+    errorMsg.textContent = ""
+  }
 
-function mailIsValid(email) {
-    if (email != undefined) {
-        email.preventDefault 
-        console.log(email)
-        const validityState   = email.validity
-        const validityMessage = email.validityMessage
-        switch(true) {
-            case validityState.valueMissing === true : {
-                email.setCustomValidity("Il faut remplir le champs !")
-                break
-            }
-            case validityState.tooShort === true : {
-                email.setCustomValidity("La taille minimum est de 6 caractères !")
-                break
-            }
-            case validityState.patternMismatch === true : {
-                email.setCustomValidity("Il faut respecter le format demandé x@x.xx !")
-                break
-            }
-            // default : email.currentTarget.submit()
-        }
-        email.reportValidity()
-    }
 }
 //
 //-----------------------------------------------------
@@ -304,9 +292,7 @@ function createImageDiv(item) {
 function submitForm(order) {
   order.preventDefault()     // empêche de rafraichir la page
   if (cart.length === 0) { 
-    //! afficher panier vide
-    // modalWindow("PANIER", "Votre panier est vide !")
-    // alert("Votre panier est vide !") 
+    theBasketIsEmpty()
     return 
   }
 
@@ -334,6 +320,18 @@ function submitForm(order) {
         })
       // }
   }
+}
+
+function theBasketIsEmpty() {
+  const parent = document.querySelector("#mess-oblig")
+  parent.style.fontweight  = "bold"
+  parent.style.textAlign   = "center"
+  parent.style.borderStyle = "solid"
+  parent.style.borderColor = "#FFF"
+  parent.style.background  = "#3d4c68"
+  parent.style.padding     = "10px"
+  parent.style.borderRadius= "15px"
+  parent.textContent       = "VOTRE PANIER EST VIDE !"
 }
 //
 //-----------------------------------------------------

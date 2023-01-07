@@ -1,0 +1,5 @@
+input:focus:valid   { color: black; }
+input:focus:invalid { color: red; }
+#panier-vide {
+    width: 100%;
+}
