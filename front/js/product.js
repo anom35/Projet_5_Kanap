@@ -18,8 +18,8 @@ function searchProduct() {
         .then((res) => res.json())
         .then((data) => loadCard(data))
         .catch((error) => {
-            window.alert("--  Connexion au serveur impossible !  --")
             console.log(error)
+            window.alert("--  Connexion au serveur impossible !  --")
           })
 }
 //
@@ -81,14 +81,6 @@ elementColor.addEventListener("change",  () => {
         testContentFields(searchArticle.quantity, elementColor.value)
     }
 }) 
-//
-//-----------------------------------------------------
-// fonction qui récupère la couleur sélectionné
-//-----------------------------------------------------
-//
-function recoverColor() {
-    const selectColor = document.querySelector("#colors")
-}
 //
 //-----------------------------------------------------
 // fonction qui test le retour d'un querySelector

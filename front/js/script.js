@@ -5,8 +5,9 @@
 //
 fetch("http://localhost:3000/api/products")
   .then((res) => res.json())
-  .then((data) => ajouteArticles(data))
+  .then((data) => addArticles(data))
   .catch((error) => {
+    console.log("Erreur de connexion avec le serveur : ", error)
     window.alert("Connexion au serveur impossible !")
   })
 //
@@ -14,7 +15,7 @@ fetch("http://localhost:3000/api/products")
 // fonction qui boucle pour afficher tous les articles
 //-----------------------------------------------------
 //
-function ajouteArticles(varData) {
+function addArticles(varData) {
     for (let cpt = 0; cpt < varData.length; cpt++) {   
         element = varData[cpt]  
         document.querySelector("#items").innerHTML += `
