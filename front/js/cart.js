@@ -203,7 +203,7 @@ function saveModifyData(item) {
 //
 function placeholder() {
   const email = document.querySelector("#email")
-  email.addEventListener("keyup", (element) => controlEmail(element))
+  email.addEventListener("keyup", (element) => controlEmail())
   const form = document.querySelector(".cart__order__form")
   const inputs = form.querySelectorAll("input")
   inputs.forEach((element) => { 
@@ -214,19 +214,21 @@ function placeholder() {
   })
 }
 
-function controlEmail(element) { 
+function controlEmail() { 
   const pattern = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/i)
-  const valueTextEmail = element.currentTarget.value
-  const resultRegex = valueTextEmail.match(pattern)
-  const errorMsg = document.querySelector("#emailErrorMsg")
+  const elem    = document.querySelector("#email")
+  const valueTextEmail = elem.value
+  const resultRegex    = valueTextEmail.match(pattern)
+  const errorMsg       = document.querySelector("#emailErrorMsg")
   if (resultRegex == null) {
-    element.currentTarget.style.color = "#FF0000"
+    elem.style.color = "#FF0000"
     errorMsg.textContent = "Veuillez entrer une adresse email valide !"
+    return false
   } else {
-    element.currentTarget.style.color = "#000"
+    elem.style.color = "#000"
     errorMsg.textContent = ""
+    return true
   }
-
 }
 //
 //-----------------------------------------------------
@@ -295,32 +297,33 @@ function submitForm(order) {
     theBasketIsEmpty()
     return 
   }
-
   // test si les champs sont vides
   const pass = testFieldsIsEmpty()
   if (pass) {
-
       // construit l'objet avec les données de contacts et la liste des IDs des articles
       const contactForm = createObjetForContactForm()
-      // if (mailIsValid()) {
 
-      fetch("http://localhost:3000/api/products/order", {
-        method: "POST",                     
-        body: JSON.stringify(contactForm),
-        headers: { "Content-Type"  : "application/json" }
-      })
-        .then((res) => res.json())
-        .then((data) => { 
-          const orderId = data.orderId
-          window.location.href = "confirmation.html?orderId=" + orderId
-        })
-        .catch((err) => {
-          console.error(err)
-          alert("erreur: " + err)
-        })
-      // }
+      if (controlEmail()) sendCommand(contactForm)
   }
 }
+
+async function sendCommand(contactForm) {
+  await fetch("http://localhost:3000/api/products/order", {
+    method: "POST",                     
+    body: JSON.stringify(contactForm),
+    headers: { "Content-Type"  : "application/json" }
+  })
+    .then((res) => res.json())
+    .then((data) => { 
+      const orderId = data.orderId
+      window.location.href = "confirmation.html?orderId=" + orderId
+    })
+    .catch((err) => {
+      console.error(err)
+      alert("erreur: " + err)
+    })
+}
+
 
 function theBasketIsEmpty() {
   const parent = document.querySelector("#mess-oblig")
@@ -354,17 +357,17 @@ function listIDs() {
 //-----------------------------------------------------
 //
 function testInData(element) {
-  const form = document.querySelector(".cart__order__form")
-  const inputs = form.querySelectorAll("input")
-  if (element.value === "") {
-    if (element.id != "order") {
+   if (element.id != "order") {
+    if (element.value === "") {
       element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
-      return false
-    }
-  } else {
-    if (element.id != "order") {
+    } else {
       element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
-      return true
+      switch(element.id) {
+        case "firstName" : document.querySelector("#firstNameErrorMsg").textContent = ""
+        case "lastName"  : document.querySelector("#lastNameErrorMsg").textContent = ""
+        case "address"   : document.querySelector("#addressErrorMsg").textContent = ""
+        case "city"      : document.querySelector("#cityErrorMsg").textContent = ""
+      }
     }
   }
 }
@@ -396,36 +399,46 @@ function testFieldsIsEmpty() {
   const inputs = form.querySelectorAll("input")
   let pass = true
   inputs.forEach((element) => {
-    element.addEventListener("input", () => { 
-      console.log(element.id, " - ", element.value)
-      switch(true) {
-        case (element.id == "firstname" && element.value == "") : { 
-          testInData(element); 
+
+    element.addEventListener("input", () => testInData(element))
+
+    switch(element.id) {
+      case "firstName" : { 
+        if (element.value == "") {
+          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
           document.querySelector("#firstNameErrorMsg").textContent = "Veuillez entrer votre prénom"
           pass = false 
         }
-        case (element.id == "lastname"  && element.value == "") : { 
-          testInData(element) 
+      }
+      case "lastName" : { 
+        if (element.value == "") {
+          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
           document.querySelector("#lastNameErrorMsg").textContent = "Veuillez entrer votre nom"
           pass = false 
         }
-        case (element.id == "address"   && element.value == "") : {
-          testInData(element) 
+      }
+      case "address" : {
+        if (element.value == "") {
+          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
           document.querySelector("#addressErrorMsg").textContent = "Veuillez entrer votre adresse"
           pass = false 
         }
-        case (element.id == "city"      && element.value == "") : {
-          testInData(element) 
+      }
+      case "city" : {
+        if (element.value == "") {
+          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
           document.querySelector("#cityErrorMsg").textContent = "Veuillez entrer une ville"
           pass = false 
         }
-        case (element.id == "email"     && element.value == "") : {
-          testInData(element) 
-          document.querySelector("#emailErrorMsg").textContent = "Veuillez entrer une adresse email valide"
+      }
+      case "email" : {
+        if (element.value == "") {
+          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+          document.querySelector("#emailErrorMsg").textContent = "Veuillez entrer une adresse email valide !"
           pass = false 
         }
       }
-    })
+    }
   })
   return pass
 }
