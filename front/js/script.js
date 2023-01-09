@@ -1,24 +1,16 @@
 //
 //-----------------------------------------------------
-// interroge la base de données
+// interroge la base de données , récupère les produits et les affichent sur la page d'accueil
 //-----------------------------------------------------
 //
-fetch("http://localhost:3000/api/products")
-  .then((res) => res.json())
-  .then((data) => addArticles(data))
-  .catch((error) => {
-    console.log("Erreur de connexion avec le serveur : ", error)
-    window.alert("Connexion au serveur impossible !")
-  })
-//
-//-----------------------------------------------------
-// fonction qui boucle pour afficher tous les articles
-//-----------------------------------------------------
-//
-function addArticles(varData) {
-    for (let cpt = 0; cpt < varData.length; cpt++) {   
-        element = varData[cpt]  
-        document.querySelector("#items").innerHTML += `
+addArticles()
+async function addArticles() {
+  await fetch("http://localhost:3000/api/products")
+    .then((res) => res.json())
+    .then((data) => {
+      for (let cpt = 0; cpt < data.length; cpt++) {   
+      element = data[cpt]  
+      document.querySelector("#items").innerHTML += `
         <a href="./product.html?id=${element._id}">
             <article>
               <img src="${element.imageUrl}" alt="${element.altTxt}">
@@ -26,5 +18,11 @@ function addArticles(varData) {
               <p class="productDescription">${element.description}</p>
             </article>
         </a>`
-     }
+      }
+    }
+  )
+  .catch((error) => {
+    console.log("Erreur de connexion avec le serveur : ", error)
+    window.alert("Connexion au serveur impossible !")
+  })
 }

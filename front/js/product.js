@@ -13,8 +13,8 @@ searchProduct()
 // recherche un produit par son id et charge une fonction précise
 //-----------------------------------------------------
 //
-function searchProduct() {
-    fetch("http://localhost:3000/api/products/" + varId)  
+async function searchProduct() {
+    await fetch("http://localhost:3000/api/products/" + varId)  
         .then((res) => res.json())
         .then((data) => loadCard(data))
         .catch((error) => {
@@ -70,19 +70,6 @@ document.querySelector("#addToCart").addEventListener("click", addQuantityToCart
 document.querySelector('[name="itemQuantity"]').addEventListener("input", modifyQuantity)
 //
 //-----------------------------------------------------
-// récupère la couleur sélectionné, et rempli la quantité avec la valeur déjà enregistré du panier si elle existe
-//-----------------------------------------------------
-//
-const elementColor = document.querySelector('#colors')
-elementColor.addEventListener("change",  () => {
-    const searchArticle = findIdColor(varId, elementColor.value)
-    if (searchArticle != undefined) {
-        document.querySelector("#quantity").value = searchArticle.quantity
-        testContentFields(searchArticle.quantity, elementColor.value)
-    }
-}) 
-//
-//-----------------------------------------------------
 // fonction qui test le retour d'un querySelector
 //-----------------------------------------------------
 //
@@ -116,7 +103,7 @@ function addQuantityToCart() {
         if ((currentQuantity > 0 && currentQuantity <= 100) && (currentColor != "")) {
             colorGrisBorder()                              
             if (arrayProduct != undefined) {
-                arrayProduct.quantity = parseInt(currentQuantity) 
+                arrayProduct.quantity += parseInt(currentQuantity) 
                 if (arrayProduct.quantity > 100) {
                     document.querySelector("#quantity").value = 100
                     arrayProduct.quantity = 100

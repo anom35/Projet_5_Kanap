@@ -10,12 +10,12 @@ const orderButton = document.querySelector("#order")
 orderButton.addEventListener("click", (order) => submitForm(order))
 
 // fonction qui rempli le panier avec le contenu du localStorage, et affiche les articles
-function loadCart() {
+async function loadCart() {
   const items  = localStorage.length
   for (let cpt = 0; cpt < items; cpt++) {
     const item  = localStorage.getItem(localStorage.key(cpt))
     let itemParser = JSON.parse(item)
-    fetch("http://localhost:3000/api/products/" + itemParser.id)  
+    await fetch("http://localhost:3000/api/products/" + itemParser.id)  
     .then((res)  => res.json())
     .then((data) => {  
       let objectProduct = {
@@ -166,9 +166,9 @@ function addDivQuantity(settings, item) {
 //-----------------------------------------------------
 //
 function ListenQuantity(id, newValue, item) {
-  const itemUpdate = cart.find((item) => item.id === id)
+  const itemUpdate = cart.find((product) => product.id === id && product.color == item.color) //! ajout couleur
   itemUpdate.quantity = parseInt(newValue)
-  item.quantity = itemUpdate.quantity
+  item.quantity = parseInt(itemUpdate.quantity)
   afficheTotalQuantity()
   afficheTotalPrice()
   saveModifyData(item)
@@ -397,17 +397,35 @@ function testFieldsIsEmpty() {
   let pass = true
   inputs.forEach((element) => {
     element.addEventListener("input", () => { 
-      if (element.id != "order") testInData(element) 
-    })
-    if (element.value === "") {
-      if (element.id != "order") {
-        element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
-        pass = false
+      console.log(element.id, " - ", element.value)
+      switch(true) {
+        case (element.id == "firstname" && element.value == "") : { 
+          testInData(element); 
+          document.querySelector("#firstNameErrorMsg").textContent = "Veuillez entrer votre prénom"
+          pass = false 
+        }
+        case (element.id == "lastname"  && element.value == "") : { 
+          testInData(element) 
+          document.querySelector("#lastNameErrorMsg").textContent = "Veuillez entrer votre nom"
+          pass = false 
+        }
+        case (element.id == "address"   && element.value == "") : {
+          testInData(element) 
+          document.querySelector("#addressErrorMsg").textContent = "Veuillez entrer votre adresse"
+          pass = false 
+        }
+        case (element.id == "city"      && element.value == "") : {
+          testInData(element) 
+          document.querySelector("#cityErrorMsg").textContent = "Veuillez entrer une ville"
+          pass = false 
+        }
+        case (element.id == "email"     && element.value == "") : {
+          testInData(element) 
+          document.querySelector("#emailErrorMsg").textContent = "Veuillez entrer une adresse email valide"
+          pass = false 
+        }
       }
-    } else {
-      console.log(element.value)
-      if (element.id != "order") element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
-    }
+    })
   })
   return pass
 }
