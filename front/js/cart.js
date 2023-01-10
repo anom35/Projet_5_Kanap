@@ -3,7 +3,6 @@ let cart          = []
 let displayUnique = true
 
 // charge tout le localStorage dans le panier
-initLoad()
 loadCart()
 
 // sélectionne le bouton "Commander" et le met en écoute d'un click
@@ -52,6 +51,7 @@ function displayItem(item) {
   document.querySelector("#cart__items").appendChild(article)
   afficheTotalQuantity()
   afficheTotalPrice()
+  initLoad()
 }
 //
 //-----------------------------------------------------
@@ -215,6 +215,8 @@ function initLoad() {
     if (element.value != "") {
       if (element.id === "order") element.setAttribute("style", "padding-left: 28px;")
       if (element.id != "order") element.setAttribute("style", "padding-left: 15px;") 
+    } else {
+      if (element.id != "order") element.setAttribute("style", "padding-left: 15px;")
     }
   })
 }
@@ -369,10 +371,22 @@ function testInData(element) {
     } else {
       element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
       switch(element.id) {
-        case "firstName" : document.querySelector("#firstNameErrorMsg").textContent = ""
-        case "lastName"  : document.querySelector("#lastNameErrorMsg").textContent = ""
-        case "address"   : document.querySelector("#addressErrorMsg").textContent = ""
-        case "city"      : document.querySelector("#cityErrorMsg").textContent = ""
+        case "firstName" : { 
+          document.querySelector("#firstNameErrorMsg").textContent = ""
+          break
+        }
+        case "lastName"  : { 
+          document.querySelector("#lastNameErrorMsg").textContent = ""
+          break
+        }
+        case "address"   : { 
+          document.querySelector("#addressErrorMsg").textContent = ""
+          break
+        }
+        case "city"      : { 
+          document.querySelector("#cityErrorMsg").textContent = ""
+          break
+        }
       }
     }
   }
