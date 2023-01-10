@@ -168,12 +168,9 @@ function addDivQuantity(settings, item) {
 //-----------------------------------------------------
 //
 function ListenQuantity(id, newValue, item) {
-  console.log(cart)
   const itemUpdate = cart.find((product) => product.id === id && product.color == item.color) 
-  console.log("newValue => " + typeof(newValue))  //!
   itemUpdate.quantity = parseInt(newValue)
-  console.log("itemUpdate.quantity => " + typeof(itemUpdate.quantity))
-  item.quantity = parseInt(itemUpdate.quantity)   //!
+  item.quantity = parseInt(itemUpdate.quantity)  
   afficheTotalQuantity()
   afficheTotalPrice()
   saveModifyData(item)
@@ -199,7 +196,6 @@ function saveModifyData(item) {
   const key        = `${item.id}-${item.color}`
   localStorage.setItem(key, dataToSave)
   cart.splice(0, cart.length)
-  console.log(cart + " - " + cart.length)
   loadCart()
 }
 //
