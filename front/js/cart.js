@@ -1,5 +1,6 @@
-// déclare la variable panier en globale
-const cart   = []
+// déclare les variables globale
+let cart          = []
+let displayUnique = true
 
 // charge tout le localStorage dans le panier
 placeholder()
@@ -28,13 +29,14 @@ async function loadCart() {
         name     : data.name
       }
       cart.push(objectProduct)
-      displayItem(cart[cpt])
+      if (displayUnique) displayItem(cart[cpt])
     })
     .catch((error) => {
         window.alert("--  Connexion au serveur impossible !  --")
         console.log(error)
       })
   }
+  displayUnique = false
 }
 //
 //-----------------------------------------------------
@@ -68,7 +70,7 @@ function afficheTotalQuantity() {
 //
 function afficheTotalPrice() {
   const totalPrice = document.querySelector("#totalPrice")
-  const total = cart.reduce((total, item) => total + item.price * item.quantity, 0)
+  const total = cart.reduce((total, item) => total+ item.price * item.quantity, 0)
   totalPrice.textContent = total
 }
 //
@@ -155,8 +157,8 @@ function addDivQuantity(settings, item) {
   input.name  = "itemQuantity"
   input.min   = "1"
   input.max   = "100"
-  input.value = item.quantity
-  input.addEventListener("input", () => ListenQuantity(item.id, input.value, item))
+  input.value = parseInt(item.quantity)
+  input.addEventListener("input", () => ListenQuantity(item.id, parseInt(input.value), item))
   quantity.appendChild(input)
   settings.appendChild(quantity)
 }
@@ -166,9 +168,12 @@ function addDivQuantity(settings, item) {
 //-----------------------------------------------------
 //
 function ListenQuantity(id, newValue, item) {
-  const itemUpdate = cart.find((product) => product.id === id && product.color == item.color) //! ajout couleur
+  console.log(cart)
+  const itemUpdate = cart.find((product) => product.id === id && product.color == item.color) 
+  console.log("newValue => " + typeof(newValue))  //!
   itemUpdate.quantity = parseInt(newValue)
-  item.quantity = parseInt(itemUpdate.quantity)
+  console.log("itemUpdate.quantity => " + typeof(itemUpdate.quantity))
+  item.quantity = parseInt(itemUpdate.quantity)   //!
   afficheTotalQuantity()
   afficheTotalPrice()
   saveModifyData(item)
@@ -193,6 +198,9 @@ function saveModifyData(item) {
   const dataToSave = JSON.stringify(tempArray)
   const key        = `${item.id}-${item.color}`
   localStorage.setItem(key, dataToSave)
+  cart.splice(0, cart.length)
+  console.log(cart + " - " + cart.length)
+  loadCart()
 }
 //
 //-----------------------------------------------------
@@ -202,6 +210,7 @@ function saveModifyData(item) {
 //-----------------------------------------------------
 //
 function placeholder() {
+  document.getElementById("mess-oblig").style.textAlign = "right"
   const email = document.querySelector("#email")
   email.addEventListener("keyup", (element) => controlEmail())
   const form = document.querySelector(".cart__order__form")
@@ -221,11 +230,11 @@ function controlEmail() {
   const resultRegex    = valueTextEmail.match(pattern)
   const errorMsg       = document.querySelector("#emailErrorMsg")
   if (resultRegex == null) {
-    elem.style.color = "#FF0000"
+    elem.setAttribute("style", "color: #FF0000")
     errorMsg.textContent = "Veuillez entrer une adresse email valide !"
     return false
   } else {
-    elem.style.color = "#000"
+    elem.setAttribute("style", "color: #000")
     errorMsg.textContent = ""
     return true
   }
@@ -275,17 +284,6 @@ function createImageDiv(item) {
   div.appendChild(image)
   return div
 }
-
-// * Expects request to contain:
-// * contact: {
-// *   firstName: string,
-// *   lastName: string,
-// *   address: string,
-// *   city: string,
-// *   email: string
-// * }
-// * products: [string] <-- array of product _id
-
 //
 //-----------------------------------------------------
 // fonction qui transmet le formulaire et les données à la page confirmation.html
@@ -359,7 +357,7 @@ function listIDs() {
 function testInData(element) {
    if (element.id != "order") {
     if (element.value === "") {
-      element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+      element.setAttribute("style", "border:1px solid #FF0000; padding-left: 15px;")
     } else {
       element.setAttribute("style", "border:1px solid #767676; padding-left: 15px;")
       switch(element.id) {
@@ -405,35 +403,35 @@ function testFieldsIsEmpty() {
     switch(element.id) {
       case "firstName" : { 
         if (element.value == "") {
-          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+          element.setAttribute("style", "border:1px solid #FF0000; padding-left: 15px;")
           document.querySelector("#firstNameErrorMsg").textContent = "Veuillez entrer votre prénom"
           pass = false 
         }
       }
       case "lastName" : { 
         if (element.value == "") {
-          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+          element.setAttribute("style", "border:1px solid #FF0000; padding-left: 15px;")
           document.querySelector("#lastNameErrorMsg").textContent = "Veuillez entrer votre nom"
           pass = false 
         }
       }
       case "address" : {
         if (element.value == "") {
-          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+          element.setAttribute("style", "border:1px solid #FF0000; padding-left: 15px;")
           document.querySelector("#addressErrorMsg").textContent = "Veuillez entrer votre adresse"
           pass = false 
         }
       }
       case "city" : {
         if (element.value == "") {
-          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+          element.setAttribute("style", "border:1px solid #FF0000; padding-left: 15px;")
           document.querySelector("#cityErrorMsg").textContent = "Veuillez entrer une ville"
           pass = false 
         }
       }
       case "email" : {
         if (element.value == "") {
-          element.setAttribute("style", "border:2px solid #FF0000; padding-left: 15px;")
+          element.setAttribute("style", "border:1px solid #FF0000; padding-left: 15px;")
           document.querySelector("#emailErrorMsg").textContent = "Veuillez entrer une adresse email valide !"
           pass = false 
         }
