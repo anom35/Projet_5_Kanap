@@ -218,7 +218,11 @@ function placeholder() {
     }
   })
 }
-
+//
+//-----------------------------------------------------
+// fonction qui à chaque frappe de caractère si le contenu est correctement formaté
+//-----------------------------------------------------
+//
 function controlEmail() { 
   const pattern = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/i)
   const elem    = document.querySelector("#email")
@@ -300,7 +304,11 @@ function submitForm(order) {
       if (controlEmail()) sendCommand(contactForm)
   }
 }
-
+//
+//-----------------------------------------------------
+// fonction qui transmet la commande
+//-----------------------------------------------------
+//
 async function sendCommand(contactForm) {
   await fetch("http://localhost:3000/api/products/order", {
     method: "POST",                     
@@ -317,18 +325,22 @@ async function sendCommand(contactForm) {
       alert("erreur: " + err)
     })
 }
-
-
+//
+//-----------------------------------------------------
+// fonction qui affiche "Votre panier est vide !"
+//-----------------------------------------------------
+//
 function theBasketIsEmpty() {
   const parent = document.querySelector("#mess-oblig")
+  parent.style.color       = "#82FA58"
   parent.style.fontweight  = "bold"
-  parent.style.textAlign   = "center"
   parent.style.borderStyle = "solid"
-  parent.style.borderColor = "#FFF"
+  parent.style.borderColor = "#E3F6CE"
   parent.style.background  = "#3d4c68"
   parent.style.padding     = "10px"
   parent.style.borderRadius= "15px"
-  parent.textContent       = "VOTRE PANIER EST VIDE !"
+  parent.style.textAlign   = "center"
+  parent.textContent       = "Votre panier est vide"
 }
 //
 //-----------------------------------------------------
