@@ -3,7 +3,7 @@ let cart          = []
 let displayUnique = true
 
 // charge tout le localStorage dans le panier
-placeholder()
+initLoad()
 loadCart()
 
 // sélectionne le bouton "Commander" et le met en écoute d'un click
@@ -205,7 +205,7 @@ function saveModifyData(item) {
 // et test si les éléments du formulaire sont vides.
 //-----------------------------------------------------
 //
-function placeholder() {
+function initLoad() {
   document.getElementById("mess-oblig").style.textAlign = "right"
   const email = document.querySelector("#email")
   email.addEventListener("keyup", (element) => controlEmail())
