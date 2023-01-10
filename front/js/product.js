@@ -73,9 +73,7 @@ document.querySelector('[name="itemQuantity"]').addEventListener("input", modify
 // fonction qui test le retour d'un querySelector
 //-----------------------------------------------------
 //
-function testParent(parent) {
-    return (parent != null) ? true : false
-}
+function testParent(parent) { return (parent != null) ? true : false }
 //
 //-----------------------------------------------------
 // fonction de création de la balise image <option>
