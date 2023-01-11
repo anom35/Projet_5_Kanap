@@ -232,11 +232,11 @@ function controlEmail() {
   const resultRegex    = valueTextEmail.match(pattern)
   const errorMsg       = document.querySelector("#emailErrorMsg")
   if (resultRegex == null) {
-    elem.setAttribute("style", "color: #FF0000")
+    elem.setAttribute("style", "color: #FF0000; padding-left: 15px;")
     errorMsg.textContent = "Veuillez entrer une adresse email valide !"
     return false
   } else {
-    elem.setAttribute("style", "color: #000")
+    elem.setAttribute("style", "color: #000; padding-left: 15px;")
     errorMsg.textContent = ""
     return true
   }
