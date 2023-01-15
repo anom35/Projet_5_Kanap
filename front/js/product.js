@@ -3,8 +3,8 @@
 // récupère l'URL et l'ID de l'article
 //-----------------------------------------------------
 //
-let varId = new URLSearchParams(window.location.search).get("id")
-let panier       = []
+let varId  = new URLSearchParams(window.location.search).get("id")
+let panier = []
 searchProduct()
 //
 //-----------------------------------------------------
