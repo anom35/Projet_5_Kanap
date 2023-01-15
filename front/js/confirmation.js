@@ -1,5 +1,3 @@
-const queryString = window.location.search
-const urlParams   = new URLSearchParams(queryString)
-const orderId     = urlParams.get("orderId")
+let orderId = new URLSearchParams(window.location.search).get("orderId")
 document.getElementById("orderId").textContent =  orderId
 window.localStorage.clear()

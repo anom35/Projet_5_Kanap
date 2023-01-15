@@ -3,9 +3,7 @@
 // récupère l'URL et l'ID de l'article
 //-----------------------------------------------------
 //
-const urlPage   = window.location.search            // récupère l'URL de la page
-const urlParams = new URLSearchParams(urlPage)      // récupère les données après le ? de l'URL
-let varId       = urlParams.get("id")
+let varId = new URLSearchParams(window.location.search).get("id")
 let panier       = []
 searchProduct()
 //
