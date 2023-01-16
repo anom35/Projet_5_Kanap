@@ -13,7 +13,7 @@ orderButton.addEventListener("click", (order) => submitForm(order))
 async function loadCart() {
   const items  = localStorage.length
   for (let cpt = 0; cpt < items; cpt++) {
-    const item  = localStorage.getItem(localStorage.key(cpt))
+    const item = localStorage.getItem(localStorage.key(cpt))
     let itemParser = JSON.parse(item)
     await fetch("http://localhost:3000/api/products/" + itemParser.id)  
     .then((res)  => res.json())
