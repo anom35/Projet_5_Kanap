@@ -142,7 +142,7 @@ function modifyQuantity() {
     let arrayProduct    = findIdColor(varId, currentColor)
     let currentQuantity = parseInt(document.querySelector("#quantity").value)
     if (currentQuantity != null && arrayProduct != undefined) {
-        arrayProduct.quantity = parseInt(document.querySelector("#quantity").value)
+        arrayProduct.quantity = currentQuantity
         saveData(arrayProduct)
     }
 }
