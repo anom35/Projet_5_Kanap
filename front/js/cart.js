@@ -200,7 +200,7 @@ function saveModifyData(item) {
 }
 //
 //-----------------------------------------------------
-// fonction qui affecte un pattern regex au input #email,
+// fonction qui met en écoute le texte tapé dans le input #email,
 // met un peu de padding-left pour une question d'esthétique, 
 // et test si les éléments du formulaire sont vides.
 //-----------------------------------------------------
