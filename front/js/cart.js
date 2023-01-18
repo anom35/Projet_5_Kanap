@@ -19,7 +19,6 @@ function loadCart() {
         }
     }
 }
-
 //
 //-----------------------------------------------------
 // Function qui récupère et renvois les données d'un article
@@ -48,10 +47,6 @@ async function searchProduct(id, color, quantity) {
             window.alert('Connexion au serveur impossible !');
             console.log(error);
         });
-}
-
-function c(texte) {
-    console.log(texte);
 }
 //
 //-----------------------------------------------------
@@ -170,7 +165,6 @@ function afficheTotalPrice() {
     const total = cart.reduce((total, item) => total + item.price * item.quantity, 0);
     totalPrice.textContent = total;
 }
-
 //
 //-----------------------------------------------------
 // fonction qui créer le block de suppression et met le lien "supprimer" en écoute
