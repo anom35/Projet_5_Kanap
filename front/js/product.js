@@ -3,22 +3,21 @@
 // récupère l'URL et l'ID de l'article
 //-----------------------------------------------------
 //
-let varId  = new URLSearchParams(window.location.search).get("id")
-let panier = []
-searchProduct()
+let varId = new URLSearchParams(window.location.search).get('id');
+searchProduct();
 //
 //-----------------------------------------------------
 // recherche un produit par son id et charge une fonction précise
 //-----------------------------------------------------
 //
 async function searchProduct() {
-    await fetch("http://localhost:3000/api/products/" + varId)  
+    await fetch('http://localhost:3000/api/products/' + varId)
         .then((res) => res.json())
         .then((data) => loadCard(data))
         .catch((error) => {
-            console.log(error)
-            window.alert("--  Connexion au serveur impossible !  --")
-          })
+            console.log(error);
+            window.alert('Connexion au serveur impossible !');
+        });
 }
 //
 //-----------------------------------------------------
@@ -27,31 +26,21 @@ async function searchProduct() {
 //
 function loadCard(data) {
     if (data != null) {
-        let parent = document.querySelector(".item__img")
-        if (testParent(parent)) parent.innerHTML += `<img src="${data.imageUrl}" alt="${data.altTxt}">` 
-        parent = document.querySelector("#title")
-        if (testParent(parent)) parent.textContent = data.name
-        parent = document.querySelector("#price")
-        if (testParent(parent)) parent.textContent = data.price 
-        parent = document.querySelector("#description")
-        if (testParent(parent)) parent.textContent = data.description 
+        let parent = document.querySelector('.item__img');
+        parent.innerHTML += `<img src="${data.imageUrl}" alt="${data.altTxt}">`;
+
+        parent = document.querySelector('#title');
+        parent.textContent = data.name;
+
+        parent = document.querySelector('#price');
+        parent.textContent = data.price;
+
+        parent = document.querySelector('#description');
+        parent.textContent = data.description;
+
         for (let cpt = 0; cpt < data.colors.length; cpt++) {
-            createChoice(data.colors[cpt])                
+            createChoice(data.colors[cpt]);
         }
-        loadPanier()
-    }
-}
-//
-//-----------------------------------------------------
-// function qui charge le contenu du panier en vue de trouver des doublons
-//-----------------------------------------------------
-//
-function loadPanier() {
-    const nbreRec  = localStorage.length
-    let valStorage = {}
-    for (let cpt=0; cpt < nbreRec; cpt++) {
-        valStorage = JSON.parse(localStorage.getItem(localStorage.key(cpt)))
-        panier.push(valStorage)
     }
 }
 //
@@ -59,30 +48,24 @@ function loadPanier() {
 // déclenche la fonction addQuantityToCard au click sur le bouton
 //-----------------------------------------------------
 //
-document.querySelector("#addToCart").addEventListener("click", addQuantityToCart)
+document.querySelector('#addToCart').addEventListener('click', addQuantityToCart);
 //
 //-----------------------------------------------------
 // déclenche la fonction modifyQuantity lorsque la quantité est modifié, et la met à jour
 //-----------------------------------------------------
 //
-document.querySelector('[name="itemQuantity"]').addEventListener("input", modifyQuantity)
-//
-//-----------------------------------------------------
-// fonction qui test le retour d'un querySelector
-//-----------------------------------------------------
-//
-function testParent(parent) { return (parent != null) ? true : false }
+document.querySelector('[name="itemQuantity"]').addEventListener('input', modifyQuantity);
 //
 //-----------------------------------------------------
 // fonction de création de la balise image <option>
 //-----------------------------------------------------
 //
 function createChoice(varChoice) {
-    const varOption = document.createElement("option")
-    varOption.value = varChoice 
-    varOption.textContent = varChoice
-    const parent = document.querySelector("#colors")
-    if (testParent(parent)) parent.appendChild(varOption)
+    const varOption = document.createElement('option');
+    varOption.value = varChoice;
+    varOption.textContent = varChoice;
+    const parent = document.querySelector('#colors');
+    parent.appendChild(varOption);
 }
 //
 //-----------------------------------------------------
@@ -91,45 +74,42 @@ function createChoice(varChoice) {
 //
 function addQuantityToCart() {
     // récupère la quantité et la couleur sélectionné
-    const currentQuantity = document.querySelector("#quantity").value
-    const currentColor    = document.querySelector("#colors").value  
-    let arrayProduct      = []
-    if (localStorage.length > 0) {
-        arrayProduct = findIdColor(varId, currentColor)
-        if ((currentQuantity > 0 && currentQuantity <= 100) && (currentColor != "")) {
-            colorGrisBorder()                              
-            if (arrayProduct != undefined) {
-                arrayProduct.quantity += parseInt(currentQuantity) 
-                if (arrayProduct.quantity > 100) {
-                    document.querySelector("#quantity").value = 100
-                    arrayProduct.quantity = 100
+    const newQuantity = document.querySelector('#quantity').value;
+    const currentColor = document.querySelector('#colors').value;
+
+    if (newQuantity > 0 && newQuantity <= 100 && currentColor != '') {
+        let arrayProduct = JSON.parse(localStorage.getItem('product'));
+        colorGrisBorder();
+
+        let objJson = {
+            id: varId,
+            quantity: parseInt(newQuantity),
+            color: currentColor,
+        };
+
+        if (arrayProduct == null) {
+            arrayProduct = [];
+            arrayProduct.push(objJson);
+        } else {
+            const productSearch = arrayProduct.find((product) => product.id == objJson.id && product.color == objJson.color);
+            if (productSearch != undefined) {
+                if (parseInt(productSearch.quantity) + parseInt(objJson.quantity) > 100) {
+                    product.quantity = 100;
                 }
+                arrayProduct.forEach((product) => {
+                    if (product.id == objJson.id && product.color == objJson.color) {
+                        product.quantity = parseInt(product.quantity) + parseInt(objJson.quantity);
+                    }
+                });
             } else {
-                let objJson = {
-                    id       : varId,
-                    quantity : parseInt(currentQuantity),
-                    color    : currentColor
-                }
-                arrayProduct = objJson
+                arrayProduct.push(objJson);
             }
-            saveData(arrayProduct)
-            window.location.href = "index.html"
-        } else { 
-            testContentFields(currentQuantity, currentColor) 
         }
+        localStorage.setItem('product', JSON.stringify(arrayProduct));
+        window.location.href = 'index.html';
     } else {
-        if ((currentQuantity > 0 && currentQuantity <= 100) && (currentColor != "")) {
-            let objJson = {
-            id       : varId,
-            quantity : parseInt(currentQuantity),
-            color    : currentColor
-            }
-            arrayProduct = objJson
-            saveData(arrayProduct)
-            window.location.href = "index.html"
-        } else { 
-            testContentFields(currentQuantity, currentColor) 
-        }
+        // test le/les champs qui n'ont pas été renseigné.
+        testContentFields(newQuantity, currentColor);
     }
 }
 //
@@ -138,32 +118,26 @@ function addQuantityToCart() {
 //-----------------------------------------------------
 //
 function modifyQuantity() {
-    const currentColor  = parseInt(document.querySelector("#colors").value)
-    let arrayProduct    = findIdColor(varId, currentColor)
-    let currentQuantity = parseInt(document.querySelector("#quantity").value)
+    const currentColor = parseInt(document.querySelector('#colors').value);
+    let arrayProduct = findIdColor(varId, currentColor);
+    let currentQuantity = parseInt(document.querySelector('#quantity').value);
     if (currentQuantity != null && arrayProduct != undefined) {
-        arrayProduct.quantity = currentQuantity
-        saveData(arrayProduct)
+        arrayProduct.quantity = currentQuantity;
+        localStorage.setItem('product', JSON.stringify(arrayProduct));
     }
 }
 //
 //-----------------------------------------------------
-// fonction qui recherche un doublon ou les paramètres "id" et "color" sont ceux de l'article en cours 
+// fonction qui recherche un doublon ou les paramètres "id" et "color" sont ceux de l'article en cours
 //-----------------------------------------------------
 //
 function findIdColor(id, color) {
-    const valRetour = panier.find((element) => element.id == id && element.color == color)
-    return (valRetour != undefined) ? valRetour : undefined
-}
-//
-//-----------------------------------------------------
-// fonction de sauvegarde des données dans le localStorage
-//-----------------------------------------------------
-//
-function saveData(item) {
-    const dataToSave = JSON.stringify(item)
-    const key = `${item.id}-${item.color}`
-    localStorage.setItem(key, dataToSave)
+    let item = {};
+    for (let cpt = 0; cpt < localStorage.length; cpt++) {
+        item = JSON.parse(localStorage.getItem('product', cpt));
+        if (item.id == id && item.color == color) return item;
+    }
+    return undefined;
 }
 //
 //-----------------------------------------------------
@@ -171,23 +145,23 @@ function saveData(item) {
 //-----------------------------------------------------
 //
 function testContentFields(varQuantity, varColor) {
-    if (varQuantity <= 0 || varQuantity > 100) { 
-        const varElement = document.querySelector("input")
-        const varParent = document.getElementById("#quantity")
-        varElement.setAttribute("style", "border:2px solid #FF0000;") 
+    if (varQuantity <= 0 || varQuantity > 100) {
+        const varElement = document.querySelector('input');
+        const varParent = document.getElementById('#quantity');
+        varElement.setAttribute('style', 'border:2px solid #FF0000;');
     } else {
-        const varSelect = document.querySelector("input")         
-        const varColors = document.getElementById("#quantity")
-        varSelect.setAttribute("style", "border:1px solid #767676;") 
+        const varSelect = document.querySelector('input');
+        const varColors = document.getElementById('#quantity');
+        varSelect.setAttribute('style', 'border:1px solid #767676;');
     }
-    if (varColor == "") {                   
-        const varElement = document.querySelector("select")
-        const varParent = document.getElementById("#colors")  
-        varElement.setAttribute("style", "border:2px solid #FF0000;")  
-    }  else {
-        const varElement = document.querySelector("select")
-        const varParent = document.getElementById("#colors")
-        varElement.setAttribute("style", "border:1px solid #767676;")
+    if (varColor == '') {
+        const varElement = document.querySelector('select');
+        const varParent = document.getElementById('#colors');
+        varElement.setAttribute('style', 'border:2px solid #FF0000;');
+    } else {
+        const varElement = document.querySelector('select');
+        const varParent = document.getElementById('#colors');
+        varElement.setAttribute('style', 'border:1px solid #767676;');
     }
 }
 //
@@ -195,12 +169,12 @@ function testContentFields(varQuantity, varColor) {
 // fonction qui met les bordures en gris
 //-----------------------------------------------------
 //
-function colorGrisBorder() {                              
-    const varInput = document.querySelector("input")
-    const varQuantity = document.getElementById("#quantity")
-    varInput.setAttribute("style", "border:1px solid #767676;")
+function colorGrisBorder() {
+    const varInput = document.querySelector('input');
+    const varQuantity = document.getElementById('#quantity');
+    varInput.setAttribute('style', 'border:1px solid #767676;');
 
-    const varSelect = document.querySelector("select")
-    const varColors = document.getElementById("#colors")
-    varSelect.setAttribute("style", "border:1px solid #767676;")
+    const varSelect = document.querySelector('select');
+    const varColors = document.getElementById('#colors');
+    varSelect.setAttribute('style', 'border:1px solid #767676;');
 }
