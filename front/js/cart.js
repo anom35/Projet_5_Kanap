@@ -18,6 +18,7 @@ function loadCart() {
             searchProduct(jsonLs[cpt].id, jsonLs[cpt].color, jsonLs[cpt].quantity);
         }
     }
+    initLoad();
 }
 //
 //-----------------------------------------------------
