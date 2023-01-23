@@ -234,7 +234,7 @@ function addDivQuantity(settings, item) {
     input.max = '100';
     input.value = parseInt(item.quantity);
 
-    input.addEventListener('input', () => ListenQuantity(item.id, parseInt(input.value), item));
+    input.addEventListener('input', () => ListenQuantity(item.id, item));
 
     quantity.appendChild(input);
     settings.appendChild(quantity);
@@ -244,10 +244,15 @@ function addDivQuantity(settings, item) {
 // fonction qui met à jour la modification de quantité d'un article
 //-----------------------------------------------------
 //
-function ListenQuantity(id, newValue, item) {
+function ListenQuantity(id, item) {
+    let valeurTexte = document.querySelector('.itemQuantity').value;
     const itemUpdate = cart.find((product) => product.id === id && product.color == item.color);
+    if (valeurTexte > 100) {
+        item.quantity = 100;
+        valeurTexte = document.querySelector('.itemQuantity').value = 100;
+    }
     if (itemUpdate != null) {
-        itemUpdate.quantity = parseInt(newValue);
+        itemUpdate.quantity = parseInt(valeurTexte);
         item.quantity = parseInt(itemUpdate.quantity);
 
         afficheTotalQuantity();
@@ -256,7 +261,7 @@ function ListenQuantity(id, newValue, item) {
         let itemLs = JSON.parse(localStorage.getItem('product'));
         for (let cpt = 0; cpt < itemLs.length; cpt++) {
             if (itemLs[cpt].id == id && itemLs[cpt].color == item.color) {
-                itemLs[cpt].quantity = newValue;
+                itemLs[cpt].quantity = valeurTexte;
                 localStorage['product'] = JSON.stringify(itemLs);
             }
         }
