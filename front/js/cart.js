@@ -234,38 +234,52 @@ function addDivQuantity(settings, item) {
     input.max = '100';
     input.value = parseInt(item.quantity);
 
-    input.addEventListener('keyup', () => ListenQuantity(item.id, parseInt(input.value), item));
-    input.addEventListener('input', () => ListenQuantity(item.id, parseInt(input.value), item));
+    input.addEventListener('keyup', () => controlQuantity(item, input));
+    input.addEventListener('input', () => ListenQuantity(item, input));
 
     quantity.appendChild(input);
     settings.appendChild(quantity);
 }
 //
 //-----------------------------------------------------
+// function qui contrôle la quantité tapé directement
+//-----------------------------------------------------
+//
+function controlQuantity(item, input) {
+    let newValue = parseInt(item.quantity);
+    if (newValue < 1 || newValue === null || isNaN(newValue)) newValue = 1;
+    if (newValue > 100) newValue = 100;
+    afficheTotalQuantity();
+    afficheTotalPrice();
+    let itemLs = JSON.parse(localStorage.getItem('product'));
+    for (let cpt = 0; cpt < itemLs.length; cpt++) {
+        if (itemLs[cpt].id == item.id && itemLs[cpt].color == item.color) {
+            itemLs[cpt].quantity = newValue;
+            localStorage.setItem('product', JSON.stringify(itemLs));
+        }
+    }
+    // if (isNaN(newValue)) newValue = 1;
+    input.value = parseInt(newValue);
+}
+//
+//-----------------------------------------------------
 // fonction qui met à jour la modification de quantité d'un article
 //-----------------------------------------------------
 //
-function ListenQuantity(id, newValue, item) {
-    if (newValue > 100) {
-        newValue = 100;
-        document.querySelector('.itemQuantity').value = 100;
-    }
-    const itemUpdate = cart.find((product) => product.id === id && product.color == item.color);
-    if (itemUpdate != null) {
-        itemUpdate.quantity = parseInt(newValue);
-        item.quantity = parseInt(itemUpdate.quantity);
-
-        afficheTotalQuantity();
-        afficheTotalPrice();
-
-        let itemLs = JSON.parse(localStorage.getItem('product'));
-        for (let cpt = 0; cpt < itemLs.length; cpt++) {
-            if (itemLs[cpt].id == id && itemLs[cpt].color == item.color) {
-                itemLs[cpt].quantity = newValue;
-                localStorage['product'] = JSON.stringify(itemLs);
-            }
+function ListenQuantity(item, input) {
+    let newValue = parseInt(input.value);
+    if (newValue > 100) input.value = 100;
+    item.quantity = parseInt(newValue);
+    afficheTotalQuantity();
+    afficheTotalPrice();
+    let itemLs = JSON.parse(localStorage.getItem('product'));
+    for (let cpt = 0; cpt < itemLs.length; cpt++) {
+        if (itemLs[cpt].id == item.id && itemLs[cpt].color == item.color) {
+            itemLs[cpt].quantity = newValue;
+            localStorage.setItem('product', JSON.stringify(itemLs));
         }
     }
+    // }
 }
 //
 //-----------------------------------------------------

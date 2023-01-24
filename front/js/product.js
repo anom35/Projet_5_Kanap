@@ -55,6 +55,7 @@ document.querySelector('#addToCart').addEventListener('click', addQuantityToCart
 //-----------------------------------------------------
 //
 document.querySelector('[name="itemQuantity"]').addEventListener('input', modifyQuantity);
+document.querySelector('[name="itemQuantity"]').addEventListener('keyup', controlQuantity);
 //
 //-----------------------------------------------------
 // fonction de création de la balise image <option>
@@ -66,6 +67,18 @@ function createChoice(varChoice) {
     varOption.textContent = varChoice;
     const parent = document.querySelector('#colors');
     parent.appendChild(varOption);
+}
+//
+//-----------------------------------------------------
+// function qui contrôle la quantité tapé directement
+//-----------------------------------------------------
+//
+function controlQuantity() {
+    const quantity = document.querySelector('#quantity').value;
+    if (quantity != null) {
+        if (quantity < 0) document.querySelector('#quantity').value = 0;
+        if (quantity > 100) document.querySelector('#quantity').value = 100;
+    }
 }
 //
 //-----------------------------------------------------
@@ -93,12 +106,27 @@ function addQuantityToCart() {
         } else {
             const productSearch = arrayProduct.find((product) => product.id == objJson.id && product.color == objJson.color);
             if (productSearch != undefined) {
-                if (parseInt(productSearch.quantity) + parseInt(objJson.quantity) > 100) {
-                    product.quantity = 100;
+                const valeurPresente = productSearch.quantity;
+                if (valeurPresente + newQuantity > 100) {
+                    arrayProduct.quantity = 100;
+                    let max = 100 - valeurPresente;
+                    if (max > 0) {
+                        alert(`vous avez déjà ${valeurPresente} article(s) dans votre panier, 
+                        la limite maximale de 100 sera dépassé ! 
+                        ${max} articles sont ajouté au panier !`);
+                    } else {
+                        alert('Quantité maximale atteinte !');
+                    }
+                } else {
+                    arrayProduct.quantity = valeurPresente + newQuantity;
                 }
                 arrayProduct.forEach((product) => {
                     if (product.id == objJson.id && product.color == objJson.color) {
-                        product.quantity = parseInt(product.quantity) + parseInt(objJson.quantity);
+                        if (valeurPresente + newQuantity <= 100) {
+                            product.quantity = parseInt(product.quantity) + parseInt(objJson.quantity);
+                        } else {
+                            product.quantity = 100;
+                        }
                     }
                 });
             } else {
