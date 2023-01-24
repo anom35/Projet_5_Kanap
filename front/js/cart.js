@@ -234,6 +234,7 @@ function addDivQuantity(settings, item) {
     input.max = '100';
     input.value = parseInt(item.quantity);
 
+    input.addEventListener('keyup', () => ListenQuantity(item.id, parseInt(input.value), item));
     input.addEventListener('input', () => ListenQuantity(item.id, parseInt(input.value), item));
 
     quantity.appendChild(input);
