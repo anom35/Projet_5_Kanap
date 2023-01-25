@@ -63,8 +63,9 @@ function displayItem(item) {
     article.appendChild(cardItem);
 
     document.querySelector('#cart__items').appendChild(article);
-    afficheTotalQuantity();
     afficheTotalPrice();
+    afficheTotalQuantity();
+
     initLoad();
 }
 //
@@ -152,9 +153,13 @@ function createDivSettings(item) {
 //-----------------------------------------------------
 //
 function afficheTotalQuantity() {
-    const totalQuantity = document.querySelector('#totalQuantity');
-    const total = cart.reduce((total, item) => total + item.quantity, 0);
-    totalQuantity.textContent = total;
+    const parent = document.querySelector('#totalQuantity');
+    let total = 0;
+    const LS = JSON.parse(localStorage.getItem('product'));
+    for (let cpt = 0; cpt < LS.length; cpt++) {
+        total += parseInt(LS[cpt].quantity);
+        parent.textContent = parseInt(total);
+    }
 }
 //
 //-----------------------------------------------------
@@ -162,9 +167,21 @@ function afficheTotalQuantity() {
 //-----------------------------------------------------
 //
 function afficheTotalPrice() {
-    const totalPrice = document.querySelector('#totalPrice');
-    const total = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-    totalPrice.textContent = total;
+    const parent = document.querySelector('#totalPrice');
+    let total = 0;
+    const LS = JSON.parse(localStorage.getItem('product'));
+    for (let cpt = 0; cpt < LS.length; cpt++) {
+        fetch('http://localhost:3000/api/products/' + LS[cpt].id)
+            .then((res) => res.json())
+            .then((data) => {
+                total += parseInt(data.price) * parseInt(LS[cpt].quantity);
+                parent.textContent = parseInt(total);
+            })
+            .catch((error) => {
+                window.alert('Connexion au serveur impossible !');
+                console.log(error);
+            });
+    }
 }
 //
 //-----------------------------------------------------
@@ -235,7 +252,7 @@ function addDivQuantity(settings, item) {
     input.value = parseInt(item.quantity);
 
     input.addEventListener('keyup', () => controlQuantity(item, input));
-    input.addEventListener('input', () => ListenQuantity(item, input));
+    input.addEventListener('input', () => listenQuantity(item, input));
 
     quantity.appendChild(input);
     settings.appendChild(quantity);
@@ -246,40 +263,50 @@ function addDivQuantity(settings, item) {
 //-----------------------------------------------------
 //
 function controlQuantity(item, input) {
+    inputValue = input.value;
+
     let newValue = parseInt(item.quantity);
-    if (newValue < 1 || newValue === null || isNaN(newValue)) newValue = 1;
+    if (newValue < 1 || newValue === 'null' || isNaN(newValue) || newValue === '') newValue = 1;
     if (newValue > 100) newValue = 100;
-    afficheTotalQuantity();
-    afficheTotalPrice();
+    input.value = newValue;
     let itemLs = JSON.parse(localStorage.getItem('product'));
     for (let cpt = 0; cpt < itemLs.length; cpt++) {
         if (itemLs[cpt].id == item.id && itemLs[cpt].color == item.color) {
-            itemLs[cpt].quantity = newValue;
-            localStorage.setItem('product', JSON.stringify(itemLs));
+            if (newValue > 0 && newValue <= 100) {
+                itemLs[cpt].quantity = newValue;
+                localStorage.setItem('product', JSON.stringify(itemLs));
+            } else {
+                itemLs[cpt].quantity = 1;
+                localStorage.setItem('product', JSON.stringify(itemLs));
+            }
         }
     }
-    // if (isNaN(newValue)) newValue = 1;
-    input.value = parseInt(newValue);
+    afficheTotalPrice();
+    afficheTotalQuantity();
 }
 //
 //-----------------------------------------------------
 // fonction qui met à jour la modification de quantité d'un article
 //-----------------------------------------------------
 //
-function ListenQuantity(item, input) {
+function listenQuantity(item, input) {
     let newValue = parseInt(input.value);
     if (newValue > 100) input.value = 100;
     item.quantity = parseInt(newValue);
-    afficheTotalQuantity();
-    afficheTotalPrice();
     let itemLs = JSON.parse(localStorage.getItem('product'));
     for (let cpt = 0; cpt < itemLs.length; cpt++) {
         if (itemLs[cpt].id == item.id && itemLs[cpt].color == item.color) {
-            itemLs[cpt].quantity = newValue;
-            localStorage.setItem('product', JSON.stringify(itemLs));
+            if (newValue > 0 && newValue <= 100) {
+                itemLs[cpt].quantity = newValue;
+                localStorage.setItem('product', JSON.stringify(itemLs));
+            } else {
+                itemLs[cpt].quantity = 1;
+                localStorage.setItem('product', JSON.stringify(itemLs));
+            }
         }
     }
-    // }
+    afficheTotalPrice();
+    afficheTotalQuantity();
 }
 //
 //-----------------------------------------------------
