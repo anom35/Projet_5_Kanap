@@ -8,6 +8,14 @@ loadCart();
 const orderButton = document.querySelector('#order');
 orderButton.addEventListener('click', (order) => submitForm(order));
 
+// met en écoute certains champs du formulaire et modifie le contenu
+const parent = document.getElementById('firstName');
+parent.addEventListener('keyup', () => testValidityForm(parent));
+const parent2 = document.getElementById('lastName');
+parent2.addEventListener('keyup', () => testValidityForm(parent2));
+const parent3 = document.getElementById('city');
+parent3.addEventListener('keyup', () => testValidityForm(parent3));
+
 // fonction qui récupère le contenu du localStorage, et affiche les articles
 function loadCart() {
 	const recoverLs = localStorage.getItem('product');
@@ -331,6 +339,28 @@ function initLoad() {
 			if (element.id != 'order') element.setAttribute('style', 'padding-left: 15px;');
 		}
 	});
+}
+//
+//-----------------------------------------------------
+// fonction qui si des caratères ou chiffres sont dans certains champs du formulaire
+//-----------------------------------------------------
+//
+function testValidityForm(parent) {
+	let textTemp = parent.value;
+	let newStr = textTemp.replace(/0/g, '');
+	newStr = newStr.replace(/1/g, '');
+	newStr = newStr.replace(/2/g, '');
+	newStr = newStr.replace(/3/g, '');
+	newStr = newStr.replace(/4/g, '');
+	newStr = newStr.replace(/5/g, '');
+	newStr = newStr.replace(/6/g, '');
+	newStr = newStr.replace(/7/g, '');
+	newStr = newStr.replace(/8/g, '');
+	newStr = newStr.replace(/9/g, '');
+	newStr = newStr.replace(/'/g, '');
+	newStr = newStr.replace(/"/g, '');
+	newStr = newStr.replace(/=/g, '');
+	parent.value = newStr;
 }
 //
 //-----------------------------------------------------
